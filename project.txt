@@ -1,0 +1,12 @@
+project content: 
+
+use neural network to predict next action/path for robot
+
+Meeting: Wednesday morning (11am)
+- goal is to come up with milestones for mid-progress report
+
+mid-progress (5/26): 
+- data generation (map -> path)
+  - autoencoder? (map -> encodes into only the important features)
+- decide architecture for neural network
+- recurrent neural network?
