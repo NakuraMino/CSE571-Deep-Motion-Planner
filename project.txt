@@ -10,3 +10,31 @@ mid-progress (5/26):
   - autoencoder? (map -> encodes into only the important features)
 - decide architecture for neural network
 - recurrent neural network?
+
+-----------------------------------------
+Nishant discussion points for 20th May
+-----------------------------------------
+
+Points to discuss:
+- Advice about the project given in guided hw pdf.
+- Start without non-holonomic. Predict x_t+1 given x_t, map and goal. Use A* as supervisor.
+- Is encoder necessary? How can decoder be created?
+- Inputs from TAs regarding:
+  - If encoder necessary, its output dimension?
+  - Recommended map size?
+  - NN structure? Feedforward?
+  - If NN is to predict u_t instead of x_t+1, are the dynamics presumed to be known or separate network to learn dynamics? How about non-holonomic version?
+- Neglect dynamic obstacles as mentioned in [7] for now. Mostly try to replicate [6]
+- How to structure dataset
+
+Possible mid-progress goals:
+- Get A* working
+- Generate trajectories (holonomic for now) in given maps with random init, goal positions using A*
+- Create training and testing sets
+
+Next steps:
+- Decide on NN architecture
+- Implement and train NN
+- If results good, move on to robot with non-holonomic constraints
+
+-----------------------------------------
