@@ -1,0 +1,40 @@
+-------------------
+Mid-Progress Report
+-------------------
+
+- Dataset (Me)
+- Dataloader (Nishant)
+- files to test our code (Me) 
+- Neural Network architectures (Designing)
+  - 128x128 
+  - CNNs? nn?
+  - RNN (Pratik)
+
+- dataset
+  - randomly generate start/goal states (valid)
+  - start+current state (x,y) / goal state (x,y) / image map (128x128) / next_state (x,y)
+
+  - epochs (each trajectory is an epoch), pair of consecutive states as the whole dataset
+Due: Saturday Night
+
+- Office hours
+  - 2pm-3pm
+
+
+
+
+-----------------------
+Ignore stuff below here
+-----------------------
+
+Brainstormed Milestone Ideas:
+
+- Dataset Generation (Me)
+- Designing Neural Networks and posting initial architectures (post to Github for all)
+  - one that takes in encoded maps as input
+  - one that takes in the actual map as input
+- Dataloader (Nishant)
+- Explore Recurrent Neural Networks (Pratik?)
+- Set up files to test neural networks / visualize paths (Any takers?)
+- Autoencoders 
+  - not strictly necessary but might be useful since they're used in the MPNet Paper?
