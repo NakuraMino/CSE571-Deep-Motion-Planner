@@ -84,6 +84,9 @@ class Map(object):
 
         self.laser_max_range = laser_max_range
 
+        self.xlimit = [0, np.shape(self.occupancy_grid)[1]-1]
+        self.ylimit = [0, np.shape(self.occupancy_grid)[0]-1]
+
     def _compute_free_area(self):
         return np.sum((self.occupancy_grid == 0)) * self.resolution**2
 
@@ -166,6 +169,20 @@ class Map(object):
         :param xys: a numpy array of size N x 2 containing N points.
         '''
         return rotate_2d(xys, heading) + pos
+
+    def state_validity_checker(self, config):
+        """ Return True if all states are valid
+
+            @param config: a [2 x n] numpy array of states
+        """
+        for i in range(config.shape[1]):
+            xt = config[:,i].astype(int)
+            y, x = xt[0], xt[1]
+            if y < self.ylimit[0] or y > self.ylimit[1] or x < self.xlimit[0] or x > self.xlimit[1]:
+                return False
+            if self.occupancy_grid[y, x] != 0:
+                return False
+        return True
 
 
 class Visualizer:
