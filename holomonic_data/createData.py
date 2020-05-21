@@ -24,7 +24,7 @@ def main(planning_env, planner, start, goal, argplan = 'astar'):
     else:
         visited = planner.visited
     # TODO: Comment out later
-    # planning_env.visualize_plan(plan, tree, visited)
+    planning_env.visualize_plan(plan, tree, visited)
     # plt.show()
     return plan
 
@@ -81,31 +81,33 @@ if __name__ == "__main__":
     with open("data.csv", mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
         for dirname, dirnames, filenames in os.walk('../train_maps'):
-            for subdirname in dirnames:
-                map_path = dirname + "/" + subdirname + "/floorplan.yaml"
-                
-                img_path = "./images/" + str(image_num) + ".jpg"
-                if image_num == 10:
-                    break
-                image_num += 1
+    
+            while True:
+                for subdirname in dirnames:
+                    map_path = dirname + "/" + subdirname + "/floorplan.yaml"
+                    
+                    img_path = "./images/" + str(image_num) + ".jpg"
+                    if image_num == 200:
+                        break
+                    image_num += 1
 
-                m = Map(map_path, laser_max_range=4, downsample_factor=1)
-                im = m.return_image()
-                cv2.imwrite(img_path, im)
+                    m = Map(map_path, laser_max_range=4, downsample_factor=1)
+                    im = m.return_image()
+                    cv2.imwrite(img_path, im)
 
-                args.start = get_random_state(m)
-                args.goal = get_random_state(m)
+                    args.start = get_random_state(m)
+                    args.goal = get_random_state(m)
 
-                planning_env = MapEnvironment(m, args.start, args.goal)
+                    planning_env = MapEnvironment(m, args.start, args.goal, image_num)
 
-                # Next setup the planner
-                planner = AStarPlanner(planning_env, args.epsilon)
-                
-                plan = main(planning_env, planner, args.start, args.goal, args.planner)
-                
-                if plan.shape[1] > 2:
-                    for i in range(plan.shape[1] - 1):
-                        xt = plan[:,i]
-                        xtt = plan[:,i + 1]
-                        y = get_label(xt, xtt)
-                        csv_writer.writerow([xt[0],xt[1],xtt[0],xtt[1],map_path,y])
+                    # Next setup the planner
+                    planner = AStarPlanner(planning_env, args.epsilon)
+                    
+                    plan = main(planning_env, planner, args.start, args.goal, args.planner)
+                    
+                    if plan.shape[1] > 2:
+                        for i in range(plan.shape[1] - 1):
+                            xt = plan[:,i]
+                            xtt = plan[:,i + 1]
+                            y = get_label(xt, xtt)
+                            csv_writer.writerow([xt[0],xt[1],xtt[0],xtt[1],map_path,y])
