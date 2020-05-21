@@ -20,7 +20,7 @@ Under images/, you will see random croppings of images. Here's a quick rundown:
   - (This might bias our results, so I can change if need be)
 
 data.csv contains:
-start_y, start_x, map_file_path, action
+curr_y, curr_x, goal_y, goal_x, map_file_path, action
 
 Here are a few things to note about the data file:
 - for each A* path generated, I create len(path) data points, with each point along the path used as start_y, start_x
@@ -32,7 +32,7 @@ Here are a few things to note about the data file:
 | 3 | 5 | 8 |
 |---|---|---|
 | 2 | x | 7 |
-| 1 | 4 | 8 |
+| 1 | 4 | 6 |
 
 
 ## TODO:
