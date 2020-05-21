@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# A* stuff
+holomonic_data/AStarPlanner.py
+holomonic_data/MapEnvironment.py
