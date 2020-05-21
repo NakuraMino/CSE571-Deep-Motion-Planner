@@ -23,33 +23,30 @@ def main(planning_env, planner, start, goal, argplan = 'astar'):
         tree = planner.tree
     else:
         visited = planner.visited
-    
     # TODO: Comment out later
-    planning_env.visualize_plan(plan, tree, visited)
-    plt.show()
-
+    # planning_env.visualize_plan(plan, tree, visited)
+    # plt.show()
     return plan
 
-
 def get_label(xt, xtt):
-    dx = xtt[0] - xt[0]
-    dy = xtt[1] - xt[1]
+    dy = xtt[0] - xt[0]
+    dx = xtt[1] - xt[1]
     if dx == -1 and dy == 1:
-        return 1
-    if dx == 0 and dy == 1:
-        return 2
-    if dx == 1 and dy == 1:
         return 3
-    if dx == -1 and dy == 0:
-        return 4
-    if dx == 1 and dy == 0:
+    if dx == 0 and dy == 1:
         return 5
-    if dx == -1 and dy == -1:
-        return 6
-    if dx == 0 and dy == -1:
-        return 7
-    if dx == 1 and dy == -1:
+    if dx == 1 and dy == 1:
         return 8
+    if dx == -1 and dy == 0:
+        return 2
+    if dx == 1 and dy == 0:
+        return 7
+    if dx == -1 and dy == -1:
+        return 1
+    if dx == 0 and dy == -1:
+        return 4
+    if dx == 1 and dy == -1:
+        return 6
 
 def get_random_state(env):
     state = np.zeros((2,1))
@@ -64,6 +61,7 @@ def get_random_state(env):
 if __name__ == "__main__":
     import csv 
     import os
+    import cv2
 
     parser = argparse.ArgumentParser(description='script for testing planners')
 
@@ -78,23 +76,36 @@ if __name__ == "__main__":
     # First setup the environment and the robot.
     dim = 2 # change to 3 for holonomic
     
-    map_path = 'demo_map/floorplan.yaml'
-    m = Map(map_path, laser_max_range=4, downsample_factor=5)
-
-    args.start = get_random_state(m)
-    args.goal = get_random_state(m)
-
-    planning_env = MapEnvironment(m, args.start, args.goal)
-
-    # Next setup the planner
-    planner = AStarPlanner(planning_env, args.epsilon)
+    image_num = 0
     
-    plan = main(planning_env, planner, args.start, args.goal, args.planner)
-    
-    if plan.shape[1] > 2:
-        for i in range(plan.shape[1] - 1):
-            xt = plan[:,i]
-            xtt = plan[:,i + 1]
-            y = get_label(xt, xtt)
+    with open("data.csv", mode='w', newline='') as csv_file:
+        csv_writer = csv.writer(csv_file, delimiter=',')
+        for dirname, dirnames, filenames in os.walk('../train_maps'):
+            for subdirname in dirnames:
+                map_path = dirname + "/" + subdirname + "/floorplan.yaml"
+                
+                img_path = "./images/" + str(image_num) + ".jpg"
+                if image_num == 10:
+                    break
+                image_num += 1
 
-            print(xt, xtt, map_path, y)
+                m = Map(map_path, laser_max_range=4, downsample_factor=1)
+                im = m.return_image()
+                cv2.imwrite(img_path, im)
+
+                args.start = get_random_state(m)
+                args.goal = get_random_state(m)
+
+                planning_env = MapEnvironment(m, args.start, args.goal)
+
+                # Next setup the planner
+                planner = AStarPlanner(planning_env, args.epsilon)
+                
+                plan = main(planning_env, planner, args.start, args.goal, args.planner)
+                
+                if plan.shape[1] > 2:
+                    for i in range(plan.shape[1] - 1):
+                        xt = plan[:,i]
+                        xtt = plan[:,i + 1]
+                        y = get_label(xt, xtt)
+                        csv_writer.writerow([xt[0],xt[1],xtt[0],xtt[1],map_path,y])

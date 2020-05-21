@@ -60,6 +60,10 @@ class Map(object):
         img_file = os.path.join(os.path.dirname(path), self.cfg['image'])
 
         bitmap = cv2.imread(img_file, cv2.IMREAD_GRAYSCALE)
+        bitmap = self.crop(bitmap)
+        bitmap = cv2.resize(bitmap, (128,128))
+        self.bitmap = bitmap
+
         free_space = (bitmap >= 250).astype(np.uint8)
 
         if downsample_factor > 1:
@@ -86,6 +90,31 @@ class Map(object):
 
         self.xlimit = [0, np.shape(self.occupancy_grid)[1]-1]
         self.ylimit = [0, np.shape(self.occupancy_grid)[0]-1]
+
+    def return_image(self):
+        return self.bitmap
+
+    def crop(self, image):
+        ymax = image.shape[0]
+        xmax = image.shape[1]
+        new_img = np.zeros((500,500))
+        if ymax > 500 and xmax > 500:
+            y = np.random.randint(0, ymax - 500) # new upper left corner
+            x = np.random.randint(0, xmax - 500) # new upper left corner
+            new_img = image[y:y+500,x:x+500] 
+            div = 2
+            count = 1
+            while np.sum(new_img != 0) < ((500 ** 2) / div):
+                y = np.random.randint(0, ymax - 500) # new upper left corner
+                x = np.random.randint(0, xmax - 500) # new upper left corner
+                new_img = image[y:y+500,x:x+500] 
+                if count % 5 == 4: # decrease necessary free area if impossible
+                    div += 1
+                count += 1
+
+            return new_img
+        else: 
+            return image
 
     def _compute_free_area(self):
         return np.sum((self.occupancy_grid == 0)) * self.resolution**2
