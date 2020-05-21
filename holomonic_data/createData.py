@@ -77,20 +77,18 @@ if __name__ == "__main__":
     dim = 2 # change to 3 for holonomic
     
     image_num = 0
-    
+    total_paths = 200
     with open("data.csv", mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
         for dirname, dirnames, filenames in os.walk('../train_maps'):
-    
-            while True:
+            while image_num < total_paths:
                 for subdirname in dirnames:
+                    if image_num == total_paths:
+                        break
                     map_path = dirname + "/" + subdirname + "/floorplan.yaml"
                     
                     img_path = "./images/" + str(image_num) + ".jpg"
-                    if image_num == 200:
-                        break
-                    image_num += 1
-
+                    
                     m = Map(map_path, laser_max_range=4, downsample_factor=1)
                     im = m.return_image()
                     cv2.imwrite(img_path, im)
@@ -99,6 +97,7 @@ if __name__ == "__main__":
                     args.goal = get_random_state(m)
 
                     planning_env = MapEnvironment(m, args.start, args.goal, image_num)
+                    image_num += 1
 
                     # Next setup the planner
                     planner = AStarPlanner(planning_env, args.epsilon)
@@ -110,4 +109,4 @@ if __name__ == "__main__":
                             xt = plan[:,i]
                             xtt = plan[:,i + 1]
                             y = get_label(xt, xtt)
-                            csv_writer.writerow([xt[0],xt[1],xtt[0],xtt[1],map_path,y])
+                            csv_writer.writerow([xt[0],xt[1],xtt[0],xtt[1],img_path,y])
