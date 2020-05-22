@@ -4,7 +4,7 @@ Mid-Progress Report
 
 - [Done] Dataset (Me)
 - Dataloader (Nishant)
-- files to test our code (Me) 
+- [Done] files to test our code (Me) 
 - Neural Network architectures (Designing)
   - 128x128 
   - CNNs? nn?
@@ -19,9 +19,6 @@ Due: Saturday Night
 
 - Office hours
   - 2pm-3pm
-
-
-
 
 -----------------------
 Ignore stuff below here
