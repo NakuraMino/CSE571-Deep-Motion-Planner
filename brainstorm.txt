@@ -2,7 +2,7 @@
 Mid-Progress Report
 -------------------
 
-- Dataset (Me)
+- [Done] Dataset (Me)
 - Dataloader (Nishant)
 - files to test our code (Me) 
 - Neural Network architectures (Designing)
