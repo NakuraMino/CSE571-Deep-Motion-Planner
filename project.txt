@@ -38,3 +38,12 @@ Next steps:
 - If results good, move on to robot with non-holonomic constraints
 
 -----------------------------------------
+
+-----------------------------------------
+Xiangyun's inputs from TA office hours (20th May 2020)
+-----------------------------------------
+
+- crop /and/ downsample map to 128x128 in pixel space (preferably 5m x 5m in world space)
+- for non-holonomic, RRT gives the correct action, which can be used as supervision. assume that the dynamics are known
+- could start with pretrained network with ImageNet (available with PyTorch) - but it may not be suited to this task, still it is possible that results might be good enough
+- encoder is not really necessary, can use a CNN to extract features from map images
