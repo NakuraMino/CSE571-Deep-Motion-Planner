@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from MapEnvironment import MapEnvironment
-from AStarPlanner import AStarPlanner
+from RRTPlannerNonholonomic import RRTPlannerNonholonomic
 from map_utils import Map
 
 def main(planning_env, planner, start, goal, argplan = 'astar'):
@@ -19,43 +19,21 @@ def main(planning_env, planner, start, goal, argplan = 'astar'):
     # Visualize the final path.
     tree = None
     visited = None
-    if argplan != 'astar':
-        tree = planner.tree
-    else:
-        visited = planner.visited
+    tree = planner.tree
     # TODO: Comment out later
     planning_env.visualize_plan(plan, tree, visited)
     # plt.show()
     return plan
 
-def get_label(xt, xtt):
-    dy = xtt[0] - xt[0]
-    dx = xtt[1] - xt[1]
-    if dx == -1 and dy == 1:
-        return 3
-    if dx == 0 and dy == 1:
-        return 5
-    if dx == 1 and dy == 1:
-        return 8
-    if dx == -1 and dy == 0:
-        return 2
-    if dx == 1 and dy == 0:
-        return 7
-    if dx == -1 and dy == -1:
-        return 1
-    if dx == 0 and dy == -1:
-        return 4
-    if dx == 1 and dy == -1:
-        return 6
-
 def get_random_state(env):
-    state = np.zeros((2,1))
+    state = np.zeros((3,1))
     state[0,0] = np.random.randint(0, env.ylimit[1])
     state[1,0] = np.random.randint(0, env.xlimit[1])
+    state[2,0] = np.random.uniform(0, np.pi * 2)
     while not env.state_validity_checker(state):
-        state = np.zeros((2,1))
         state[0,0] = np.random.randint(0, env.ylimit[1])
         state[1,0] = np.random.randint(0, env.xlimit[1])
+        state[2,0] = np.random.uniform(0, np.pi * 2)    
     return state
 
 if __name__ == "__main__":
@@ -74,7 +52,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # First setup the environment and the robot.
-    dim = 2 # change to 3 for holonomic
+    dim = 3 # change to 3 for holonomic
     
     image_num = 0
     total_paths = 200
@@ -100,7 +78,7 @@ if __name__ == "__main__":
                     image_num += 1
 
                     # Next setup the planner
-                    planner = AStarPlanner(planning_env, args.epsilon)
+                    planner = RRTPlannerNonholonomic(planning_env, args.epsilon)
                     
                     plan = main(planning_env, planner, args.start, args.goal, args.planner)
                     
@@ -108,5 +86,5 @@ if __name__ == "__main__":
                         for i in range(plan.shape[1] - 1):
                             xt = plan[:,i]
                             xtt = plan[:,i + 1]
-                            y = get_label(xt, xtt)
+                            y = None
                             csv_writer.writerow([xt[0],xt[1],xtt[0],xtt[1],img_path,y])

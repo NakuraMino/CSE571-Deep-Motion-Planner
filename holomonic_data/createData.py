@@ -109,4 +109,4 @@ if __name__ == "__main__":
                             xt = plan[:,i]
                             xtt = plan[:,i + 1]
                             y = get_label(xt, xtt)
-                            csv_writer.writerow([xt[0],xt[1],xtt[0],xtt[1],img_path,y])
+                            csv_writer.writerow([xt[0],xt[1],args.goal[0],args.goal[1],img_path,y])
