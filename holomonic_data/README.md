@@ -29,16 +29,10 @@ Here are a few things to note about the data file:
 - action is a value 1-8 specifying which direction the robot moved in (the robot has 8 possible actions)
 - each number maps to a next state: (sorry markdown gives me weird formatting but hopefully you get the point) 
 
-| 3 | 5 | 8 |
+| 1 | 4 | 6 |
 |---|---|---|
 | 2 | x | 7 |
-| 1 | 4 | 6 |
-
-
-## TODO:
-
-- generate full training dataset
-- also generate test dataset too!
+| 3 | 5 | 8 |
 
 # Original README: 
 
