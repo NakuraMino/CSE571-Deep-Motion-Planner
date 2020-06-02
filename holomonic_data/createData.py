@@ -77,17 +77,17 @@ if __name__ == "__main__":
     dim = 2 # change to 3 for holonomic
     
     image_num = 0
-    total_paths = 200
-    with open("data.csv", mode='w', newline='') as csv_file:
+    total_paths = 50
+    with open("test_data.csv", mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
-        for dirname, dirnames, filenames in os.walk('../train_maps'):
+        for dirname, dirnames, filenames in os.walk('../test_maps'):
             while image_num < total_paths:
                 for subdirname in dirnames:
                     if image_num == total_paths:
                         break
                     map_path = dirname + "/" + subdirname + "/floorplan.yaml"
                     
-                    img_path = "./images/" + str(image_num) + ".jpg"
+                    img_path = "./test_images/" + str(image_num) + ".jpg"
                     
                     m = Map(map_path, laser_max_range=4, downsample_factor=1)
                     im = m.return_image()
@@ -109,4 +109,4 @@ if __name__ == "__main__":
                             xt = plan[:,i]
                             xtt = plan[:,i + 1]
                             y = get_label(xt, xtt)
-                            csv_writer.writerow([xt[0],xt[1],args.goal[0],args.goal[1],img_path,y])
+                            csv_writer.writerow([xt[0],xt[1],args.goal[0,0],args.goal[1,0],img_path,y])

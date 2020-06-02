@@ -199,21 +199,6 @@ class Map(object):
         '''
         return rotate_2d(xys, heading) + pos
 
-    def state_validity_checker(self, config):
-        """ Return True if all states are valid
-
-            @param config: a [2 x n] numpy array of states
-        """
-        for i in range(config.shape[1]):
-            xt = config[:,i].astype(int)
-            y, x = xt[0], xt[1]
-            if y < self.ylimit[0] or y > self.ylimit[1] or x < self.xlimit[0] or x > self.xlimit[1]:
-                return False
-            if self.occupancy_grid[y, x] != 0:
-                return False
-        return True
-
-
 class Visualizer:
     def __init__(self, map, ax):
         self.map = map

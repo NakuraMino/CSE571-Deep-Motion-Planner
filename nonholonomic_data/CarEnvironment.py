@@ -7,15 +7,14 @@ class CarEnvironment(object):
         Robot state: [x, y, theta]
     """
     
-    def __init__(self, mapfile, start, goal, image_num, radius=15,
+    def __init__(self, mapObj, image_num, radius=15,
                  delta_step=10, max_linear_vel=20, max_steer_angle=1.):
 
-        self.radius = radius
-
+        # self.radius = radius
+        self.radius = 5
+        
         # Obtain the boundary limits.
         # Check if file exists.
-        # self.map = np.loadtxt(mapfile)
-
         self.mapObj = mapObj
         self.map = mapObj.occupancy_grid
         self.xlimit = [0, np.shape(self.map)[1]-1]
@@ -23,16 +22,30 @@ class CarEnvironment(object):
 
         self.i = image_num
 
-        self.delta_step = delta_step            # Number of steps in simulation rollout
-        self.max_linear_vel = max_linear_vel
-        self.max_steer_angle = max_steer_angle
+        self.delta_step = int(delta_step / 2)         # Number of steps in simulation rollout
+        self.max_linear_vel = int(max_linear_vel / 2)
+        self.max_steer_angle = int(max_steer_angle / 2)
 
+        start = self.get_random_state()
+        goal = self.get_random_state()
+        self.start = start
         self.goal = goal
 
         # Check if start and goal are within limits and collision free
         if not self.state_validity_checker(start) or not self.state_validity_checker(goal):
             raise ValueError('Start and Goal state must be within the map limits');
             exit(0)
+
+    def get_random_state(self):
+        state = np.zeros((3,1))
+        state[0,0] = np.random.randint(0, self.ylimit[1])
+        state[1,0] = np.random.randint(0, self.xlimit[1])
+        state[2,0] = np.random.uniform(0, np.pi * 2)
+        while not self.state_validity_checker(state):
+            state[0,0] = np.random.randint(0, self.ylimit[1])
+            state[1,0] = np.random.randint(0, self.xlimit[1])
+            state[2,0] = np.random.uniform(0, np.pi * 2)    
+        return state
 
     def sample(self):
         # Sample random clear point from map
@@ -244,8 +257,8 @@ class CarEnvironment(object):
         if plan is not None:
             for i in range(np.shape(plan)[1]):
                 self.plot_car(plan[:,i:i+1])
-                self.fig.canvas.draw()
-                plt.pause(.025) 
+                # self.fig.canvas.draw()
+                # plt.pause(.025) 
 
         self.fig.canvas.draw()
         self.fig.savefig('./paths/' + str(self.i) + '.png')
