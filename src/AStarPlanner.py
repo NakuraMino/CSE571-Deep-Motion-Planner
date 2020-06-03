@@ -12,19 +12,18 @@ class AStarPlanner(object):
     def Plan(self, start_config, goal_config):
         # TODO: YOUR IMPLEMENTATION HERE
 
-        import NAME_OF_NETWORK_FILE_HERE 
+        from astarnet import AStarNet 
 
-        net = NAME_OF_NETWORK()
-        net.load_state_dict(torch.load("PATH_TO_NETWORK_HERE", map_location="cpu"))
+        net = AStarNet()
+        net.load_state_dict(torch.load("./models/astarnet.pth", map_location="cpu"))
         net.eval()
-
 
         plan = []
         plan.append(start_config)
         cost = 0
-
+        iters = 0
         curr_state = start_config
-        while np.sum(curr_state != goal_config) != 0:
+        while np.sum(curr_state != goal_config) != 0 and iters < 150:
             action = net((curr_state, goal_config, self.planning_env.map))
             delta, c = self.action_to_delta(action)
             curr_state += delta

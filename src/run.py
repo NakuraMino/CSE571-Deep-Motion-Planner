@@ -5,8 +5,6 @@ import matplotlib.pyplot as plt
 from MapEnvironment import MapEnvironment
 from CarEnvironment import CarEnvironment
 from AStarPlanner import AStarPlanner
-from RRTPlanner import RRTPlanner
-from RRTStarPlanner import RRTStarPlanner
 from RRTPlannerNonholonomic import RRTPlannerNonholonomic
 
 def main(planning_env, planner, start, goal, argplan = 'astar'):
@@ -46,6 +44,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    im_path = '../holomonic_data/images/0.jpg'
+
     # First setup the environment and the robot.
     dim = 3 if args.planner == 'nonholrrt' else 2
     args.start = np.array(args.start).reshape(dim, 1)
@@ -58,10 +58,6 @@ if __name__ == "__main__":
     # Next setup the planner
     if args.planner == 'astar':
         planner = AStarPlanner(planning_env, args.epsilon)
-    elif args.planner == 'rrt':
-        planner = RRTPlanner(planning_env, bias=args.bias, eta=args.eta)
-    elif args.planner == 'rrtstar':
-        planner = RRTStarPlanner(planning_env, bias=args.bias, eta=args.eta)
     elif args.planner == 'nonholrrt':
     	planner = RRTPlannerNonholonomic(planning_env, bias=args.bias)
     else:
