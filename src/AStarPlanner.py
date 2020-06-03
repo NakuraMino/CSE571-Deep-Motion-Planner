@@ -3,10 +3,9 @@ import torch
 import cv2
 
 class AStarPlanner(object):    
-    def __init__(self, planning_env, epsilon):
+    def __init__(self, planning_env):
         self.env = planning_env
         self.nodes = {}
-        self.epsilon = epsilon
         self.visited = np.zeros(self.env.map.shape)
 
     def Plan(self, start_config, goal_config):
@@ -23,13 +22,26 @@ class AStarPlanner(object):
         cost = 0
         iters = 0
         curr_state = start_config
-        while np.sum(curr_state != goal_config) != 0 and iters < 150:
-            action = net((curr_state, goal_config, self.planning_env.map))
+        while np.sum(curr_state != goal_config) != 0 and iters < 100:
+            input_state = torch.from_numpy(np.concatenate((curr_state, goal_config), axis=0)).float().T
+            
+            input_map = torch.from_numpy(self.env.map).unsqueeze(0)
+            
+            action = net((input_state, torch.from_numpy(self.env.map_image).unsqueeze(0)))
+            
+            action = torch.argmax(action) + 1
+            
             delta, c = self.action_to_delta(action)
+            
             curr_state += delta
-            plan.append(curr_state)
+            
+            plan.append(np.copy(curr_state))
+            
             cost += c
-        # plan.append(goal_config)
+            
+            iters += 1
+    
+        # print(plan)
         
         state_count = len(plan)
         print("States Expanded: %d" % state_count)

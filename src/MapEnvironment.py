@@ -9,6 +9,7 @@ class MapEnvironment(object):
         # Obtain the boundary limits
         # self.map = np.loadtxt('map1.txt')
         map_image = cv2.imread(mapfile,0)
+        self.map_image = map_image.copy()
         whites = map_image >= 250
         blacks = map_image < 250
         map_image[whites] = 0

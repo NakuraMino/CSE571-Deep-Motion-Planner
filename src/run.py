@@ -38,9 +38,6 @@ if __name__ == "__main__":
                         help='The planner to run (astar, rrt, rrtstar, nonholrrt)')
     parser.add_argument('-s', '--start', nargs='+', type=float, required=True)
     parser.add_argument('-g', '--goal', nargs='+', type=float, required=True)
-    parser.add_argument('-eps', '--epsilon', type=float, default=1.0, help='Epsilon for A*')
-    parser.add_argument('-eta', '--eta', type=float, default=1.0, help='eta for RRT/RRT*')
-    parser.add_argument('-b', '--bias', type=float, default=0.05, help='Goal bias for RRT/RRT*')
 
     args = parser.parse_args()
 
@@ -50,16 +47,17 @@ if __name__ == "__main__":
     dim = 3 if args.planner == 'nonholrrt' else 2
     args.start = np.array(args.start).reshape(dim, 1)
     args.goal = np.array(args.goal).reshape(dim, 1)
+
     if args.planner == 'nonholrrt':
     	planning_env = CarEnvironment(args.map, args.start, args.goal)
     else:
-	    planning_env = MapEnvironment(args.map, args.start, args.goal)
+	    planning_env = MapEnvironment(im_path, args.start, args.goal)
 
     # Next setup the planner
     if args.planner == 'astar':
-        planner = AStarPlanner(planning_env, args.epsilon)
+        planner = AStarPlanner(planning_env)
     elif args.planner == 'nonholrrt':
-    	planner = RRTPlannerNonholonomic(planning_env, bias=args.bias)
+    	planner = RRTPlannerNonholonomic(planning_env)
     else:
         print('Unknown planner option: %s' % args.planner)
         exit(0)
