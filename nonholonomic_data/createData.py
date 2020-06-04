@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 
 from CarEnvironment import CarEnvironment
 from RRTPlannerNonholonomic import RRTPlannerNonholonomic
-from map_utils import Map
 
 def main(planning_env, planner, start, goal, argplan = 'astar'):
 
@@ -52,27 +51,25 @@ if __name__ == "__main__":
                 for subdirname in dirnames:
                     if image_num == total_paths:
                         break
-                    map_path = dirname + "/" + subdirname + "/floorplan.yaml"
+                    map_path = dirname + "/" + subdirname + "/floor_trav_0_v2.png"
                     
                     img_path = "./images/" + str(image_num) + ".jpg"
                     
-                    m = Map(map_path, laser_max_range=4, downsample_factor=1)
-                    im = m.return_image()
-                    cv2.imwrite(img_path, im)
-
-                    planning_env = CarEnvironment(m, image_num)
+                    planning_env = CarEnvironment(map_path, image_num)
+                    img = planning_env.return_image()
+                    cv2.imwrite(img_path, img)
                     image_num += 1
 
                     args.start = planning_env.start
                     args.goal = planning_env.goal
-
+                    
                     # Next setup the planner
-                    planner = RRTPlannerNonholonomic(planning_env, args.epsilon)
+                    planner = RRTPlannerNonholonomic(planning_env, 0.05)
                     
                     plan, actions = main(planning_env, planner, args.start, args.goal, args.planner)
                     
                     if plan.shape[1] > 2:
-                        gool = plan[0,-1]
+                        gool = plan[-1]
                         for i in range(plan.shape[1] - 1):
                             xt = plan[:,i]
                             y = actions[i]
