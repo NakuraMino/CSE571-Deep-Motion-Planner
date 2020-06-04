@@ -29,7 +29,7 @@ class AStarPlanner(object):
             
             action = net((input_state, torch.from_numpy(self.env.map_image).unsqueeze(0)))
             
-            action = torch.argmax(action) + 1
+            # action = torch.argmax(action) + 1
             
             delta, c = self.action_to_delta(action)
             
@@ -49,6 +49,15 @@ class AStarPlanner(object):
 
         return np.concatenate(plan, axis=1)
 
+
+    def getViableAction(self, action, curr_state):
+        index = torch.argmax(action) + 1
+        delta, c = self.action_to_delta(index)
+        next_state = curr_state + delta
+        while not self.env.state_validity_checker(next_state):
+            torch.delete()
+            pass
+        return next_state
     
     def action_to_delta(self, action):
         delta = np.zeros((2,1)) # [y, x]
