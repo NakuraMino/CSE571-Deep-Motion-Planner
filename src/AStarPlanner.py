@@ -25,11 +25,9 @@ class AStarPlanner(object):
         while np.sum(curr_state != goal_config) != 0 and iters < 100:
             input_state = torch.from_numpy(np.concatenate((curr_state, goal_config), axis=0)).float().T
             
-            input_map = torch.from_numpy(self.env.map).unsqueeze(0)
-            
-            action = net((input_state, torch.from_numpy(self.env.map_image).unsqueeze(0)))
-            
-            # action = torch.argmax(action) + 1
+            action = net((input_state, self.env.torch_map))
+            # print(torch.argmax(action) + 1)
+            action = torch.argmax(action) + 1
             
             delta, c = self.action_to_delta(action)
             
@@ -56,7 +54,9 @@ class AStarPlanner(object):
         next_state = curr_state + delta
         while not self.env.state_validity_checker(next_state):
             torch.delete()
+            break
             pass
+        a = x + 1
         return next_state
     
     def action_to_delta(self, action):
