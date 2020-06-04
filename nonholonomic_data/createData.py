@@ -8,8 +8,6 @@ from RRTPlannerNonholonomic import RRTPlannerNonholonomic
 def main(planning_env, planner, start, goal, argplan = 'astar'):
 
     # Notify.
-    # input('Press any key to begin planning...')
-
     planning_env.init_visualizer()
 
     # Plan.
@@ -43,8 +41,8 @@ if __name__ == "__main__":
     dim = 3 # change to 3 for holonomic
     
     image_num = 0
-    total_paths = 1
-    with open("test_data.csv", mode='w', newline='') as csv_file:
+    total_paths = 200
+    with open("data.csv", mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
         for dirname, dirnames, filenames in os.walk('../train_maps'):
             while image_num < total_paths:
@@ -73,4 +71,4 @@ if __name__ == "__main__":
                         for i in range(plan.shape[1] - 1):
                             xt = plan[:,i]
                             y = actions[i]
-                            csv_writer.writerow([xt[0],xt[1],gool[0],gool[1],img_path,y[0], y[1]])
+                            csv_writer.writerow([xt[0],xt[1],xt[2],gool[0],gool[1],gool[2],img_path,y[0], y[1]])

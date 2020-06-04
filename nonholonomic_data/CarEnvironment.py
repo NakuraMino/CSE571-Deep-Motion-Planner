@@ -33,8 +33,8 @@ class CarEnvironment(object):
 
         self.i = image_num
 
-        self.delta_step = int(delta_step / 2)         # Number of steps in simulation rollout
-        self.max_linear_vel = int(max_linear_vel / 2)
+        self.delta_step = int(delta_step * 3 / 4)         # Number of steps in simulation rollout
+        self.max_linear_vel = int(max_linear_vel * 3 / 4)
         self.max_steer_angle = max_steer_angle
 
         start = self.get_random_state()
@@ -281,6 +281,14 @@ class CarEnvironment(object):
         self.ax1.cla()
         self.ax1.imshow(visit_map, interpolation="nearest", cmap="gray")
 
+        if plan is not None:
+            for i in range(np.shape(plan)[1]):
+                self.plot_car(plan[:,i:i+1])
+                # self.fig.canvas.draw()
+                # plt.pause(.025) 
+
+        self.fig.savefig('./paths/' + str(self.i) + 'notree.png')
+
         if tree is not None:
             for idx in range(len(tree.vertices)):
                 if idx == tree.GetRootID():
@@ -291,12 +299,8 @@ class CarEnvironment(object):
                 y = [sconfig[1], econfig[1]]
                 self.ax1.plot(y, x, 'r')
 
-        if plan is not None:
-            for i in range(np.shape(plan)[1]):
-                self.plot_car(plan[:,i:i+1])
-                # self.fig.canvas.draw()
-                # plt.pause(.025) 
+        
 
-        self.fig.canvas.draw()
-        plt.pause(1)
+        # self.fig.canvas.draw()
+        # plt.pause(1)
         self.fig.savefig('./paths/' + str(self.i) + '.png')
