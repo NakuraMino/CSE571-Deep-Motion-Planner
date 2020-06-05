@@ -155,11 +155,10 @@ if __name__ == '__main__':
     cv2.destroyAllWindows()
 
 
-
 # This script is to be used just to load the class.
 # The below code is just to test if it is working
 # (with a random datapoint)
-if __name__ == '__maina__':
+if __name__ == '__main__':
     # Dataset
     csv_file = 'data.csv'
     path = '../holomonic_data/'
