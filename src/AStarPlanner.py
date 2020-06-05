@@ -18,7 +18,7 @@ class AStarPlanner(object):
         net.eval()
 
         plan = []
-        plan.append(start_config)
+        plan.append(start_config.copy())
         cost = 0
         iters = 0
         curr_state = start_config
@@ -26,20 +26,14 @@ class AStarPlanner(object):
             input_state = torch.from_numpy(np.concatenate((curr_state, goal_config), axis=0)).float().T
             
             action = net((input_state, self.env.torch_map))
-            # print(torch.argmax(action) + 1)
             action = torch.argmax(action) + 1
-            
             delta, c = self.action_to_delta(action)
-            
             curr_state += delta
-            
             plan.append(np.copy(curr_state))
-            
             cost += c
-            
             iters += 1
     
-        # print(plan)
+        print(plan)
         
         state_count = len(plan)
         print("States Expanded: %d" % state_count)
