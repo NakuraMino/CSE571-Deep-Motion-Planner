@@ -11,8 +11,10 @@ class AStarPlanner(object):
     def Plan(self, start_config, goal_config):
         # TODO: YOUR IMPLEMENTATION HERE
 
-        from astarnet import AStarNet 
-
+        # from afitnet import AStarNet
+        # net.load_state_dict(torch.load("./models/afitnet.pth", map_location="cpu"))
+        
+        from astarnet import AStarNet
         net = AStarNet()
         net.load_state_dict(torch.load("./models/astarnet.pth", map_location="cpu"))
         net.eval()
