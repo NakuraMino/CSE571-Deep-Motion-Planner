@@ -11,12 +11,9 @@ class AStarPlanner(object):
     def Plan(self, start_config, goal_config):
         # TODO: YOUR IMPLEMENTATION HERE
 
-        # from afitnet import AStarNet
-        # net.load_state_dict(torch.load("./models/afitnet.pth", map_location="cpu"))
-        
         from astarnet import AStarNet
         net = AStarNet()
-        net.load_state_dict(torch.load("./models/astarnet.pth", map_location="cpu"))
+        net.load_state_dict(torch.load("./models/astarnet500.pth", map_location="cpu"))
         net.eval()
 
         plan = []
@@ -24,36 +21,52 @@ class AStarPlanner(object):
         cost = 0
         iters = 0
         curr_state = start_config
+        self.visit(curr_state)
         while np.sum(curr_state != goal_config) != 0 and iters < 100:
             input_state = torch.from_numpy(np.concatenate((curr_state, goal_config), axis=0)).float().T
             
             action = net((input_state, self.env.torch_map))
-            action = torch.argmax(action) + 1
-            delta, c = self.action_to_delta(action)
+            # action = torch.argmax(action) + 1
+            # delta, c = self.action_to_delta(action)
+            delta, c = self.getViableAction(action, curr_state)
+            if delta is None:
+                break
             curr_state += delta
             plan.append(np.copy(curr_state))
             cost += c
             iters += 1
-    
-        print(plan)
-        
+            print(plan)
+
         state_count = len(plan)
         print("States Expanded: %d" % state_count)
         print("Cost: %f" % cost)
 
         return np.concatenate(plan, axis=1)
 
-
     def getViableAction(self, action, curr_state):
-        index = torch.argmax(action) + 1
+        action = action.detach().numpy()
+        index = np.argmax(action) + 1
         delta, c = self.action_to_delta(index)
         next_state = curr_state + delta
-        while not self.env.state_validity_checker(next_state):
-            torch.delete()
-            break
-            pass
-        a = x + 1
-        return next_state
+        count = 0
+        while self.already_visited(next_state) or not self.env.state_validity_checker(next_state):
+            action = np.delete(action, index - 1)
+            if action.shape[0] == 0:
+                return None, None
+            index = np.argmax(action) + 1
+            delta, c = self.action_to_delta(index)
+            next_state = curr_state + delta        
+            count += 1
+        self.visit(next_state)
+        return delta, c
+
+    def visit(self, state):
+        y, x = state[0, 0], state[1, 0]
+        self.visited[int(y), int(x)] = 1
+    
+    def already_visited(self, state):
+        y, x = state[0, 0], state[1, 0]
+        return self.visited[int(y), int(x)] == 1
     
     def action_to_delta(self, action):
         delta = np.zeros((2,1)) # [y, x]
@@ -79,6 +92,3 @@ class AStarPlanner(object):
             delta[0], delta[1] = -1, 1
             cost = np.sqrt(2)
         return delta, cost
-        
-
-
