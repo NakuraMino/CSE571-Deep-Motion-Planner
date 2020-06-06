@@ -19,8 +19,8 @@ class CarEnvironment(object):
         # self.map = np.loadtxt("car_map.txt")
         # self.map_image = self.map
         image = cv2.imread(mapFile, 0)
-        image = self.crop(image)
-        image = cv2.resize(image, (128,128))
+        # image = self.crop(image)
+        # image = cv2.resize(image, (128,128))
         self.map_image = np.copy(image)
         self.map = image
         whites = self.map >= 250
@@ -289,18 +289,18 @@ class CarEnvironment(object):
 
         self.fig.savefig('./paths/' + str(self.i) + 'notree.png')
 
-        if tree is not None:
-            for idx in range(len(tree.vertices)):
-                if idx == tree.GetRootID():
-                    continue
-                econfig = tree.vertices[idx]
-                sconfig = tree.vertices[tree.edges[idx]]
-                x = [sconfig[0], econfig[0]]
-                y = [sconfig[1], econfig[1]]
-                self.ax1.plot(y, x, 'r')
+        # if tree is not None:
+        #     for idx in range(len(tree.vertices)):
+        #         if idx == tree.GetRootID():
+        #             continue
+        #         econfig = tree.vertices[idx]
+        #         sconfig = tree.vertices[tree.edges[idx]]
+        #         x = [sconfig[0], econfig[0]]
+        #         y = [sconfig[1], econfig[1]]
+        #         self.ax1.plot(y, x, 'r')
 
         
 
         # self.fig.canvas.draw()
         # plt.pause(1)
-        self.fig.savefig('./paths/' + str(self.i) + '.png')
+        # self.fig.savefig('./paths/' + str(self.i) + '.png')
