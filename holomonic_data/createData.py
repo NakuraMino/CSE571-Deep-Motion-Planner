@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 
 from MapEnvironment import MapEnvironment
 from AStarPlanner import AStarPlanner
-from map_utils import Map
 
 def main(planning_env, planner, start, goal, argplan = 'astar'):
 
@@ -48,16 +47,6 @@ def get_label(xt, xtt):
     if dx == 1 and dy == -1:
         return 6
 
-def get_random_state(env):
-    state = np.zeros((2,1))
-    state[0,0] = np.random.randint(0, env.ylimit[1])
-    state[1,0] = np.random.randint(0, env.xlimit[1])
-    while not env.state_validity_checker(state):
-        state = np.zeros((2,1))
-        state[0,0] = np.random.randint(0, env.ylimit[1])
-        state[1,0] = np.random.randint(0, env.xlimit[1])
-    return state
-
 if __name__ == "__main__":
     import csv 
     import os
@@ -76,37 +65,46 @@ if __name__ == "__main__":
     # First setup the environment and the robot.
     dim = 2 # change to 3 for holonomic
     
-    image_num = 0
-    total_paths = 50
-    with open("test_data.csv", mode='w', newline='') as csv_file:
+    image_num = 66
+    total_paths = 100
+    with open("data.csv", mode='a', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
-        for dirname, dirnames, filenames in os.walk('../test_maps'):
+        for dirname, dirnames, filenames in os.walk('../train_maps'):
             while image_num < total_paths:
                 for subdirname in dirnames:
-                    if image_num == total_paths:
-                        break
-                    map_path = dirname + "/" + subdirname + "/floorplan.yaml"
                     
-                    img_path = "./test_images/" + str(image_num) + ".jpg"
+                    map_path = dirname + "/" + subdirname + "/floor_trav_0_v2.png"
                     
-                    m = Map(map_path, laser_max_range=4, downsample_factor=1)
-                    im = m.return_image()
-                    cv2.imwrite(img_path, im)
+                    img_path = "./images/" + str(image_num) + ".png"
+                    ticks_path = "./ticks/" + str(image_num) + ".png"
 
-                    args.start = get_random_state(m)
-                    args.goal = get_random_state(m)
+                    planning_env = MapEnvironment(map_path, image_num)
+                    cv2.imwrite(img_path, planning_env.get_map())
+                    planning_env.init_visualizer()
+                    planning_env.visualize_plan(path=ticks_path)
 
-                    planning_env = MapEnvironment(m, args.start, args.goal, image_num)
                     image_num += 1
 
-                    # Next setup the planner
-                    planner = AStarPlanner(planning_env, args.epsilon)
-                    
-                    plan = main(planning_env, planner, args.start, args.goal, args.planner)
-                    
-                    if plan.shape[1] > 2:
-                        for i in range(plan.shape[1] - 1):
-                            xt = plan[:,i]
-                            xtt = plan[:,i + 1]
-                            y = get_label(xt, xtt)
-                            csv_writer.writerow([xt[0],xt[1],args.goal[0,0],args.goal[1,0],img_path,y])
+                    for i in range(2):
+                        if i == 0:
+                            planning_env.setStates()
+                        else:
+                            planning_env.setRandomStates()
+
+                        args.start = planning_env.start
+                        args.goal = planning_env.goal
+
+                        # Next setup the planner
+                        planner = AStarPlanner(planning_env, args.epsilon)
+                        
+                        plan = main(planning_env, planner, args.start, args.goal, args.planner)
+                        
+                        if plan.shape[1] > 2:
+                            for i in range(plan.shape[1] - 1):
+                                xt = plan[:,i]
+                                xtt = plan[:,i + 1]
+                                y = get_label(xt, xtt)
+                                csv_writer.writerow([xt[0],xt[1],args.goal[0,0],args.goal[1,0],img_path,y])
+                        
+                    if image_num == total_paths:
+                        break
