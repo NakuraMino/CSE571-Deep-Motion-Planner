@@ -15,7 +15,7 @@ def main(planning_env, planner, start, goal, argplan = 'astar'):
     planning_env.init_visualizer()
 
     # Plan.
-    plan = planner.Plan(start, goal)
+    plan = planner.BDPlan(start, goal)
 
     # Visualize the final path.
     tree = None
