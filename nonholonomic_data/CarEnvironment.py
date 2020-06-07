@@ -284,23 +284,6 @@ class CarEnvironment(object):
         if plan is not None:
             for i in range(np.shape(plan)[1]):
                 self.plot_car(plan[:,i:i+1])
-                # self.fig.canvas.draw()
-                # plt.pause(.025) 
 
         self.fig.savefig('./paths/' + str(self.i) + 'notree.png')
-
-        # if tree is not None:
-        #     for idx in range(len(tree.vertices)):
-        #         if idx == tree.GetRootID():
-        #             continue
-        #         econfig = tree.vertices[idx]
-        #         sconfig = tree.vertices[tree.edges[idx]]
-        #         x = [sconfig[0], econfig[0]]
-        #         y = [sconfig[1], econfig[1]]
-        #         self.ax1.plot(y, x, 'r')
-
-        
-
-        # self.fig.canvas.draw()
-        # plt.pause(1)
-        # self.fig.savefig('./paths/' + str(self.i) + '.png')
+        self.fig.close()
