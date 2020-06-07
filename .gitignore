@@ -136,3 +136,5 @@ nonholonomic_data/AStarPlanner.py
 nonholonomic_data/MapEnvironment.py
 nonholonomic_data/RRTPlannerNonholonomic.py
 nonholonomic_data/RRTTree.py
+
+src/models/ShootingStarNet.pth
