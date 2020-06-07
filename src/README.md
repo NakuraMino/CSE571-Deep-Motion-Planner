@@ -19,13 +19,29 @@ where:
 
 #### Few personal notes:
 
-start/goal/map combinations that work well:
-- lots of open space
-- no obstacles
+So far, I implemented two planning algorithms. 
+- a normal planner that starts from the start state and tries to find a path to the goal state. 
+- a bidirectional planner that extends from both the start state and the goal state.
+  - I also include a (dumb) replanning algorithm that detects any states that can be removed from the path
+
+Frankly, this thing just mostly looks like a greedy planner that doesn't expand as many states.
+
+Below are a quick list of commands that work/don't work for each of the planners 
+
+##### Works for both 
+
 > python run.py -p astar -i 1 -s 20 10 -g 80 50
 > python run.py -p astar -s 98 44 -g 33 96
 
-start/goal/map combinations that don't work well:
-- shortest direct path includes obstacles
+##### Unidirectional Planner (No replanning)
+
+> python run.py -p astar -i 15 -s 60 10 -g 80 120
+
+##### Works Bidirectional Planner with replanning
+
+> python run.py -p astar -i 15 -s 60 10 -g 15 40
+
+
+##### Doesn't Work for Either
+
 > python run.py -p astar -i 0 -s 30 70 -g 75 70
- 
