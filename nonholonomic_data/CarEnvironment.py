@@ -33,7 +33,7 @@ class CarEnvironment(object):
 
         self.i = image_num
 
-        self.delta_step = int(delta_step * 3 / 4)         # Number of steps in simulation rollout
+        self.delta_step = 5 # int(delta_step * 3 / 4)         # Number of steps in simulation rollout
         self.max_linear_vel = int(max_linear_vel * 3 / 4)
         self.max_steer_angle = max_steer_angle
 
@@ -132,9 +132,8 @@ class CarEnvironment(object):
         
         # Find the closest point to x_rand on the rollout
         # This is x_new. Discard the rest of the rollout
-        min_ind = np.argmin(self.compute_distance(rollout, x_rand))
+        min_ind = self.delta_step
         x_new = rollout[:, min_ind].reshape(3,1)
-        rollout = rollout[:, :min_ind+1] # don't need the rest
         delta_t = rollout.shape[1]
         
         # Check for validity of the path
@@ -285,5 +284,4 @@ class CarEnvironment(object):
             for i in range(np.shape(plan)[1]):
                 self.plot_car(plan[:,i:i+1])
 
-        self.fig.savefig('./paths/' + str(self.i) + 'notree.png')
-        self.fig.close()
+        self.fig.savefig('./paths/' + str(self.i) + '.png')
