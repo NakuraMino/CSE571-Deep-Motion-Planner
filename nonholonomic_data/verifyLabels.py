@@ -1,9 +1,9 @@
 import numpy as np
 
 curr_state = np.zeros((3,1))
-curr_state[0,0], curr_state[1,0], curr_state[2,0] = 23.14042914, 58.30688408, 4.550857749
+curr_state[0,0], curr_state[1,0], curr_state[2,0] = 60.29744124, 81.42576255, 1.356818403
 
-linear_vel, steer_angle = -13.00024525, -0.347909538
+linear_vel, steer_angle = -14.21147428, -0.149638547
 
 dt = 0.1
 delta_step = 5
