@@ -15,7 +15,8 @@ class RRTPlannerNonholonomic(object):
 
     def Plan(self, start_config, goal_config):
         # TODO: YOUR IMPLEMENTATION HERE
-
+        
+        net = self.getNetwork(1)
         plan_time = time.time()
         plan = [start_config]
         cost = 0
@@ -23,9 +24,8 @@ class RRTPlannerNonholonomic(object):
         # Start with adding the start configuration to the tree.
         # self.tree.AddVertex(start_config)
 
-        net = self.getNetwork(0)
         curr_state = start_config.copy()
-        while not self.env.goal_criterion(curr_state, goal_config) and iters < 300:
+        while not self.env.lax_goal_criterion(curr_state, goal_config) and iters < 300:
             input_state = torch.from_numpy(np.concatenate((curr_state, goal_config), axis=0)).float().T
             action = net((input_state, self.env.torch_map))
             action = action.detach().numpy()
@@ -50,6 +50,10 @@ class RRTPlannerNonholonomic(object):
             from rrtnet import RRTNet    
             net = RRTNet()
             net.load_state_dict(torch.load("./models/rrtnet.pth", map_location="cpu"))
+        elif version == 1:
+            from rrtnet import RRTNet    
+            net = RRTNet()
+            net.load_state_dict(torch.load("./models/rrtnetnodrop.pth", map_location="cpu"))            
         # net.eval()
         return net
 

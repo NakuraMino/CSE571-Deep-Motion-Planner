@@ -191,6 +191,16 @@ class CarEnvironment(object):
         else:
             return False
 
+    def lax_goal_criterion(self, config, goal_config):
+        if np.linalg.norm(config[:2,:] - goal_config[:2,:]) < 10:
+            print(f'Goal reached! State: {config[:,0]}, Goal state: {goal_config[:,0]}')
+            print(f'xy_diff: {np.linalg.norm(config[:2,:] - goal_config[:2,:]):.03f}, '\
+                  f'ang_diff: {np.abs(self.angular_difference(config, goal_config))[0]:.03f}')
+            return True
+        else:
+            return False
+
+
     def out_of_limits_violation(self, config):
         """ Check limit violations
 
