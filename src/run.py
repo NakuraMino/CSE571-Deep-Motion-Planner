@@ -45,7 +45,7 @@ if __name__ == "__main__":
     image_folder = ''
     if args.type == 'test':
         image_folder = 'test_'
-    im_path = '../holomonic_data/' + image_folder + 'images/' + args.index + '.jpg'
+    im_path = '../holomonic_data/' + image_folder + 'images/' + args.index + '.png'
 
     # First setup the environment and the robot.
     dim = 3 if args.planner == 'nonholrrt' else 2

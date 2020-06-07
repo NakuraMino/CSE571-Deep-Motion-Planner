@@ -16,8 +16,9 @@ where:
 start/goal/map combinations that work well:
 - lots of open space
 - no obstacles
-> python run.py -p astar -i 1 -s 106 41 -g 30 80
+> python run.py -p astar -i 1 -s 20 10 -g 80 50
 
 start/goal/map combinations that don't work well:
 - shortest direct path includes obstacles
-> python run.py -p astar -s 98 44 -g 33 96
+> python run.py -p astar -i 0 -s 30 70 -g 75 70
+ python run.py -p astar -s 98 44 -g 33 96

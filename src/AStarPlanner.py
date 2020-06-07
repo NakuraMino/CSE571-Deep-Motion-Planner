@@ -11,9 +11,17 @@ class AStarPlanner(object):
     def Plan(self, start_config, goal_config):
         # TODO: YOUR IMPLEMENTATION HERE
 
-        from astarnet import AStarNet
-        net = AStarNet()
-        net.load_state_dict(torch.load("./models/astarnet500.pth", map_location="cpu"))
+        net = None
+        version = 1
+
+        if version == 0:
+            from astarnet import AStarNet    
+            net = AStarNet()
+            net.load_state_dict(torch.load("./models/astarnet500.pth", map_location="cpu"))
+        elif version == 1:
+            from shootingstarnet import ShootingStarNet
+            net = ShootingStarNet()
+            net.load_state_dict(torch.load("./models/ShootingStarNet.pth", map_location="cpu"))
         net.eval()
 
         plan = []
@@ -22,7 +30,7 @@ class AStarPlanner(object):
         iters = 0
         curr_state = start_config
         self.visit(curr_state)
-        while np.sum(curr_state != goal_config) != 0 and iters < 100:
+        while np.sum(np.abs(curr_state - goal_config)) >= 3 and iters < 300:
             input_state = torch.from_numpy(np.concatenate((curr_state, goal_config), axis=0)).float().T
             
             action = net((input_state, self.env.torch_map))
@@ -35,7 +43,7 @@ class AStarPlanner(object):
             plan.append(np.copy(curr_state))
             cost += c
             iters += 1
-            print(plan)
+        print(plan)
 
         state_count = len(plan)
         print("States Expanded: %d" % state_count)
@@ -49,7 +57,7 @@ class AStarPlanner(object):
         delta, c = self.action_to_delta(index)
         next_state = curr_state + delta
         count = 0
-        while self.already_visited(next_state) or not self.env.state_validity_checker(next_state):
+        while self.already_visited(next_state) or not self.env.state_validity_checker(next_state):    
             action = np.delete(action, index - 1)
             if action.shape[0] == 0:
                 return None, None
