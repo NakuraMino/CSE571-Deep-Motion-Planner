@@ -1,5 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
+import cv2
+import torch
 
 class CarEnvironment(object):
     """ Car Environment. Car is represented as a circular robot.
@@ -7,27 +9,82 @@ class CarEnvironment(object):
         Robot state: [x, y, theta]
     """
     
-    def __init__(self, mapfile, start, goal, radius=15,
+    def __init__(self, mapFile, image_num, radius=15,
                  delta_step=10, max_linear_vel=20, max_steer_angle=1.):
 
-        self.radius = radius
-
+        # self.radius = radius
+        self.radius = 5
+        
         # Obtain the boundary limits.
         # Check if file exists.
-        self.map = np.loadtxt(mapfile)
+        # self.map = np.loadtxt("car_map.txt")
+        # self.map_image = self.map
+        image = cv2.imread(mapFile, 0)
+        self.torch_map = torch.from_numpy(image).unsqueeze(0)
+        # image = self.crop(image)
+        # image = cv2.resize(image, (128,128))
+        self.map_image = np.copy(image)
+        self.map = image
+        whites = self.map >= 250
+        blacks = self.map < 250
+        self.map[whites] = 0
+        self.map[blacks] = 1
+
         self.xlimit = [0, np.shape(self.map)[1]-1]
         self.ylimit = [0, np.shape(self.map)[0]-1]
 
-        self.delta_step = delta_step            # Number of steps in simulation rollout
-        self.max_linear_vel = max_linear_vel
+        self.i = image_num
+
+        self.delta_step = 5 # int(delta_step * 3 / 4)         # Number of steps in simulation rollout
+        self.max_linear_vel = int(max_linear_vel * 3 / 4)
         self.max_steer_angle = max_steer_angle
 
+        start = self.get_random_state()
+        goal = self.get_random_state()
+
+        self.start = start
         self.goal = goal
 
         # Check if start and goal are within limits and collision free
         if not self.state_validity_checker(start) or not self.state_validity_checker(goal):
             raise ValueError('Start and Goal state must be within the map limits');
             exit(0)
+
+    def return_image(self):
+        return self.map_image
+
+    def crop(self, image):
+        ymax = image.shape[0]
+        xmax = image.shape[1]
+        new_img = np.zeros((500,500))
+        if ymax > 500 and xmax > 500:
+            y = np.random.randint(0, ymax - 500) # new upper left corner
+            x = np.random.randint(0, xmax - 500) # new upper left corner
+            new_img = image[y:y+500,x:x+500] 
+            div = 2
+            count = 1
+            while np.sum(new_img != 0) < ((500 ** 2) / div):
+                y = np.random.randint(0, ymax - 500) # new upper left corner
+                x = np.random.randint(0, xmax - 500) # new upper left corner
+                new_img = image[y:y+500,x:x+500] 
+                if count % 5 == 4: # decrease necessary free area if impossible
+                    div += 1
+                count += 1
+
+            return new_img
+        else: 
+            return image
+
+    def get_random_state(self):
+        state = np.zeros((3,1))
+        state[0,0] = np.random.randint(0, self.ylimit[1])
+        state[1,0] = np.random.randint(0, self.xlimit[1])
+        state[2,0] = np.random.uniform(0, np.pi * 2)
+        while not self.state_validity_checker(state):
+            state[0,0] = np.random.randint(0, self.ylimit[1])
+            state[1,0] = np.random.randint(0, self.xlimit[1])
+            state[2,0] = np.random.uniform(0, np.pi * 2)    
+        return state
 
     def sample(self):
         # Sample random clear point from map
@@ -45,7 +102,7 @@ class CarEnvironment(object):
         steer_angle = (2*np.random.rand() - 1) * self.max_steer_angle # uniformly distributed
         return linear_vel, steer_angle
 
-    def simulate_car(self, x_near, x_rand, linear_vel, steer_angle):
+    def simulate_car(self, x_near, linear_vel, steer_angle):
         """ Simulates a given control from the nearest state on the graph to the random sample.
 
             @param x_near: a [3 x 1] numpy array. Nearest point on the current graph to the random sample
@@ -77,9 +134,8 @@ class CarEnvironment(object):
         
         # Find the closest point to x_rand on the rollout
         # This is x_new. Discard the rest of the rollout
-        min_ind = np.argmin(self.compute_distance(rollout, x_rand))
+        min_ind = self.delta_step
         x_new = rollout[:, min_ind].reshape(3,1)
-        rollout = rollout[:, :min_ind+1] # don't need the rest
         delta_t = rollout.shape[1]
         
         # Check for validity of the path

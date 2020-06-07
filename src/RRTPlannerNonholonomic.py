@@ -1,6 +1,8 @@
 import numpy as np
 from RRTTree import RRTTree
 import time
+import torch 
+import cv2
 
 class RRTPlannerNonholonomic(object):
 
@@ -15,21 +17,41 @@ class RRTPlannerNonholonomic(object):
         # TODO: YOUR IMPLEMENTATION HERE
 
         plan_time = time.time()
-
-        # Start with adding the start configuration to the tree.
-        self.tree.AddVertex(start_config)
-
-        plan = []
-        plan.append(start_config)
-        plan.append(goal_config)
-
+        plan = [start_config]
         cost = 0
-        plan_time = time.time() - plan_time
+        iters = 0
+        # Start with adding the start configuration to the tree.
+        # self.tree.AddVertex(start_config)
 
+        net = self.getNetwork(0)
+        curr_state = start_config.copy()
+        while not self.env.goal_criterion(curr_state, goal_config) and iters < 300:
+            input_state = torch.from_numpy(np.concatenate((curr_state, goal_config), axis=0)).float().T
+            action = net((input_state, self.env.torch_map))
+            action = action.detach().numpy()
+            linear_vel, steer_angle = action[0,0], action[0,1]
+            # print(linear_vel, steer_angle)
+            x_new, c = self.env.simulate_car(curr_state, linear_vel, steer_angle)
+            if x_new is not None:    
+                curr_state = x_new.copy()
+                plan.append(x_new)
+                cost += c
+            iters += 1
+
+        plan_time = time.time() - plan_time
         print("Cost: %f" % cost)
         print("Planning Time: %ds" % plan_time)
 
         return np.concatenate(plan, axis=1)
+
+    def getNetwork(self, version):
+        net = None
+        if version == 0:
+            from rrtnet import RRTNet    
+            net = RRTNet()
+            net.load_state_dict(torch.load("./models/rrtnet.pth", map_location="cpu"))
+        # net.eval()
+        return net
 
     def extend(self, x_near, x_rand):
         """ Extend method for non-holonomic RRT
