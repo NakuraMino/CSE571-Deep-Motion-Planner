@@ -36,6 +36,11 @@ class RRTPlannerNonholonomic(object):
                 curr_state = x_new.copy()
                 plan.append(x_new)
                 cost += c
+            else:
+                '''
+                TODO: Potential to backtrack a few steps and make paths smoother
+                '''
+                print("none")
             iters += 1
 
         plan_time = time.time() - plan_time
@@ -43,6 +48,15 @@ class RRTPlannerNonholonomic(object):
         print("Planning Time: %ds" % plan_time)
 
         return np.concatenate(plan, axis=1)
+
+    def replanner(self, plan):
+        '''
+        TODO: Come up with some way to smoothen path
+        - perhaps smoothen path by taking states that are close to each other and removing them
+        - using the planner algorithm to plan from xt to xt_1 (instead of xt to goal) and then use that as a new path?
+        - it would probably make more sense to have another neural planner that takes in xt, xt_1 as input and predicts action
+        '''
+        pass
 
     def getNetwork(self, version):
         net = None
