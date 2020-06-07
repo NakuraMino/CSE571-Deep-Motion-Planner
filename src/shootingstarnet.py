@@ -29,7 +29,7 @@ class ShootingStarNet(nn.Module):
     self.fc5 = nn.Linear(256 + 4, 128)
     self.fc6 = nn.Linear(128, 64)
     self.fc7 = nn.Linear(64, 8)
-    self.drop1 = nn.Dropout(p)
+    # self.drop1 = nn.Dropout(p)
 
   def forward(self, x):
     config_states, maps = x
@@ -44,9 +44,9 @@ class ShootingStarNet(nn.Module):
     x = F.relu(self.fc1(x))
     x = F.relu(self.fc2(x))
     x = F.relu(self.fc3(x))
-    x = self.drop1(x)
+    # x = self.drop1(x)
     x = F.relu(self.fc4(x))
-    x = self.drop1(x)
+    # x = self.drop1(x)
     x = torch.cat((x, config_states), axis=1)
     x = F.relu(self.fc5(x))
     x = F.relu(self.fc6(x))

@@ -11,18 +11,7 @@ class AStarPlanner(object):
     def Plan(self, start_config, goal_config):
         # TODO: YOUR IMPLEMENTATION HERE
 
-        net = None
-        version = 1
-
-        if version == 0:
-            from astarnet import AStarNet    
-            net = AStarNet()
-            net.load_state_dict(torch.load("./models/astarnet500.pth", map_location="cpu"))
-        elif version == 1:
-            from shootingstarnet import ShootingStarNet
-            net = ShootingStarNet()
-            net.load_state_dict(torch.load("./models/ShootingStarNet.pth", map_location="cpu"))
-        net.eval()
+        net = self.getNetwork(1)
 
         plan = []
         plan.append(start_config.copy())

@@ -41,7 +41,6 @@ Below are a quick list of commands that work/don't work for each of the planners
 
 > python run.py -p astar -i 15 -s 60 10 -g 15 40
 
-
 ##### Doesn't Work for Either
 
 > python run.py -p astar -i 0 -s 30 70 -g 75 70
