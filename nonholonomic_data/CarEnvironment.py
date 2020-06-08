@@ -286,4 +286,4 @@ class CarEnvironment(object):
             for i in range(np.shape(plan)[1]):
                 self.plot_car(plan[:,i:i+1])
 
-        self.fig.savefig('./paths/' + str(self.i) + '.png')
+        # self.fig.savefig('./paths/' + str(self.i) + '.png')

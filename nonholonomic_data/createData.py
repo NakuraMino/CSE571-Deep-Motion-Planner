@@ -18,7 +18,7 @@ def main(planning_env, planner, start, goal, argplan = 'astar'):
     visited = None
     tree = planner.tree
     # TODO: Comment out later
-    planning_env.visualize_plan(plan, tree, visited)
+    # planning_env.visualize_plan(plan, tree, visited)
     # plt.show()
     return plan, actions
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     # First setup the environment and the robot.
     dim = 3 # change to 3 for holonomic
     
-    image_num = 369
+    image_num = 737
     total_paths = 200
     with open("data.csv", mode='a', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')

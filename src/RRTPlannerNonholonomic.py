@@ -16,7 +16,7 @@ class RRTPlannerNonholonomic(object):
     def Plan(self, start_config, goal_config):
         # TODO: YOUR IMPLEMENTATION HERE
         
-        net = self.getNetwork(1)
+        net = self.getNetwork(2)
         plan_time = time.time()
         plan = [start_config]
         cost = 0
@@ -30,6 +30,7 @@ class RRTPlannerNonholonomic(object):
             action = net((input_state, self.env.torch_map))
             action = action.detach().numpy()
             linear_vel, steer_angle = action[0,0], action[0,1]
+            linear_vel, steer_angle = self.cap_motion(linear_vel, steer_angle)
             # print(linear_vel, steer_angle)
             x_new, c = self.env.simulate_car(curr_state, linear_vel, steer_angle)
             if x_new is not None:    
@@ -37,17 +38,27 @@ class RRTPlannerNonholonomic(object):
                 plan.append(x_new)
                 cost += c
             else:
-                '''
-                TODO: Potential to backtrack a few steps and make paths smoother
-                '''
-                print("none")
+                plan = plan[:-3]
+                if len(plan) == 0:
+                    x_new = start_config.copy()
+                    plan = [start_config]
+                x_new = plan[-1]
             iters += 1
 
         plan_time = time.time() - plan_time
+        print("Num Iters: %d" % iters)
         print("Cost: %f" % cost)
         print("Planning Time: %ds" % plan_time)
 
         return np.concatenate(plan, axis=1)
+
+    def cap_motion(self, linear_vel, steer_angle):
+        if np.abs(linear_vel) > self.env.max_linear_vel:
+            linear_vel *= (self.env.max_linear_vel / np.abs(linear_vel))
+            print('max')
+        if np.abs(steer_angle) > self.env.max_steer_angle:
+            steer_angle *= (self.env.max_steer_angle / np.abs(steer_angle))
+        return linear_vel, steer_angle
 
     def replanner(self, plan):
         '''
@@ -68,7 +79,11 @@ class RRTPlannerNonholonomic(object):
         elif version == 1:
             from rrtnet import RRTNet    
             net = RRTNet()
-            net.load_state_dict(torch.load("./models/rrtnetnodrop.pth", map_location="cpu"))            
+            net.load_state_dict(torch.load("./models/rrtnetnodrop.pth", map_location="cpu")) 
+        elif version == 2:
+            from rrtnet import RRTNet    
+            net = RRTNet()
+            net.load_state_dict(torch.load("./models/rrtnet200.pth", map_location="cpu")) 
         # net.eval()
         return net
 
