@@ -55,6 +55,7 @@ class RRTPlannerNonholonomic(object):
         - perhaps smoothen path by taking states that are close to each other and removing them
         - using the planner algorithm to plan from xt to xt_1 (instead of xt to goal) and then use that as a new path?
         - it would probably make more sense to have another neural planner that takes in xt, xt_1 as input and predicts action
+        - ^ actually, scrap that idea. if we have xt and xt_1, we should be able to directly calculate the action taken.
         '''
         pass
 
