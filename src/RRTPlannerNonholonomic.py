@@ -1,6 +1,8 @@
 import numpy as np
 from RRTTree import RRTTree
 import time
+import torch 
+import cv2
 
 class RRTPlannerNonholonomic(object):
 
@@ -13,23 +15,77 @@ class RRTPlannerNonholonomic(object):
 
     def Plan(self, start_config, goal_config):
         # TODO: YOUR IMPLEMENTATION HERE
-
+        
+        net = self.getNetwork(2)
         plan_time = time.time()
-
-        # Start with adding the start configuration to the tree.
-        self.tree.AddVertex(start_config)
-
-        plan = []
-        plan.append(start_config)
-        plan.append(goal_config)
-
+        plan = [start_config]
         cost = 0
-        plan_time = time.time() - plan_time
+        iters = 0
+        # Start with adding the start configuration to the tree.
+        # self.tree.AddVertex(start_config)
 
+        curr_state = start_config.copy()
+        while not self.env.lax_goal_criterion(curr_state, goal_config) and iters < 300:
+            input_state = torch.from_numpy(np.concatenate((curr_state, goal_config), axis=0)).float().T
+            action = net((input_state, self.env.torch_map))
+            action = action.detach().numpy()
+            linear_vel, steer_angle = action[0,0], action[0,1]
+            linear_vel, steer_angle = self.cap_motion(linear_vel, steer_angle)
+            # print(linear_vel, steer_angle)
+            x_new, c = self.env.simulate_car(curr_state, linear_vel, steer_angle)
+            if x_new is not None:    
+                curr_state = x_new.copy()
+                plan.append(x_new)
+                cost += c
+            else:
+                plan = plan[:-3]
+                if len(plan) == 0:
+                    x_new = start_config.copy()
+                    plan = [start_config]
+                x_new = plan[-1]
+            iters += 1
+
+        plan_time = time.time() - plan_time
+        print("Num Iters: %d" % iters)
         print("Cost: %f" % cost)
         print("Planning Time: %ds" % plan_time)
 
         return np.concatenate(plan, axis=1)
+
+    def cap_motion(self, linear_vel, steer_angle):
+        if np.abs(linear_vel) > self.env.max_linear_vel:
+            linear_vel *= (self.env.max_linear_vel / np.abs(linear_vel))
+            print('max')
+        if np.abs(steer_angle) > self.env.max_steer_angle:
+            steer_angle *= (self.env.max_steer_angle / np.abs(steer_angle))
+        return linear_vel, steer_angle
+
+    def replanner(self, plan):
+        '''
+        TODO: Come up with some way to smoothen path
+        - perhaps smoothen path by taking states that are close to each other and removing them
+        - using the planner algorithm to plan from xt to xt_1 (instead of xt to goal) and then use that as a new path?
+        - it would probably make more sense to have another neural planner that takes in xt, xt_1 as input and predicts action
+        - ^ actually, scrap that idea. if we have xt and xt_1, we should be able to directly calculate the action taken.
+        '''
+        pass
+
+    def getNetwork(self, version):
+        net = None
+        if version == 0:
+            from rrtnet import RRTNet    
+            net = RRTNet()
+            net.load_state_dict(torch.load("./models/rrtnet.pth", map_location="cpu"))
+        elif version == 1:
+            from rrtnet import RRTNet    
+            net = RRTNet()
+            net.load_state_dict(torch.load("./models/rrtnetnodrop.pth", map_location="cpu")) 
+        elif version == 2:
+            from rrtnet import RRTNet    
+            net = RRTNet()
+            net.load_state_dict(torch.load("./models/rrtnet200.pth", map_location="cpu")) 
+        # net.eval()
+        return net
 
     def extend(self, x_near, x_rand):
         """ Extend method for non-holonomic RRT

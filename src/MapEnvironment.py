@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import cv2
+import torch
 
 class MapEnvironment(object):
     
@@ -8,13 +9,16 @@ class MapEnvironment(object):
 
         # Obtain the boundary limits
         # self.map = np.loadtxt('map1.txt')
+        # print(self.map)
+        
         map_image = cv2.imread(mapfile,0)
+        self.map_image = map_image.copy()
         whites = map_image >= 250
         blacks = map_image < 250
         map_image[whites] = 0
         map_image[blacks] = 1
-        self.map = map_image
-        
+        self.map = map_image.astype(np.float64)
+        self.torch_map = torch.from_numpy(self.map).unsqueeze(0)
 
         self.xlimit = [0, np.shape(self.map)[1]-1]
         self.ylimit = [0, np.shape(self.map)[0]-1]
@@ -58,7 +62,8 @@ class MapEnvironment(object):
             @param config: a [2 x n] numpy array of states
         """
         # TODO: YOUR IMPLEMENTATION HERE
-        return True
+        y, x = config[0,0], config[1,0]
+        return self.map[int(y),int(x)] == 0
 
     def edge_validity_checker(self, config1, config2):
         """ Return True if edge is valid

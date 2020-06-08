@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import cv2
+import torch
 
 class CarEnvironment(object):
     """ Car Environment. Car is represented as a circular robot.
@@ -19,6 +20,7 @@ class CarEnvironment(object):
         # self.map = np.loadtxt("car_map.txt")
         # self.map_image = self.map
         image = cv2.imread(mapFile, 0)
+        
         # image = self.crop(image)
         # image = cv2.resize(image, (128,128))
         self.map_image = np.copy(image)
@@ -100,7 +102,7 @@ class CarEnvironment(object):
         steer_angle = (2*np.random.rand() - 1) * self.max_steer_angle # uniformly distributed
         return linear_vel, steer_angle
 
-    def simulate_car(self, x_near, x_rand, linear_vel, steer_angle):
+    def simulate_car(self, x_near, linear_vel, steer_angle):
         """ Simulates a given control from the nearest state on the graph to the random sample.
 
             @param x_near: a [3 x 1] numpy array. Nearest point on the current graph to the random sample
@@ -284,4 +286,4 @@ class CarEnvironment(object):
             for i in range(np.shape(plan)[1]):
                 self.plot_car(plan[:,i:i+1])
 
-        self.fig.savefig('./paths/' + str(self.i) + '.png')
+        # self.fig.savefig('./paths/' + str(self.i) + '.png')

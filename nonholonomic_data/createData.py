@@ -40,7 +40,7 @@ if __name__ == "__main__":
     # First setup the environment and the robot.
     dim = 3 # change to 3 for holonomic
     
-    image_num = 738
+    image_num = 737
     total_paths = 200
     with open("data.csv", mode='a', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
