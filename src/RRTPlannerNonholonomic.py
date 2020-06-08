@@ -16,7 +16,7 @@ class RRTPlannerNonholonomic(object):
     def Plan(self, start_config, goal_config):
         # TODO: YOUR IMPLEMENTATION HERE
         
-        net = self.getNetwork(2)
+        net = self.getNetwork(3)
         plan_time = time.time()
         plan = [start_config]
         cost = 0
@@ -25,7 +25,7 @@ class RRTPlannerNonholonomic(object):
         # self.tree.AddVertex(start_config)
 
         curr_state = start_config.copy()
-        while not self.env.lax_goal_criterion(curr_state, goal_config) and iters < 300:
+        while not self.env.lax_goal_criterion(curr_state, goal_config) and iters < 1000:
             input_state = torch.from_numpy(np.concatenate((curr_state, goal_config), axis=0)).float().T
             action = net((input_state, self.env.torch_map))
             action = action.detach().numpy()
@@ -37,14 +37,15 @@ class RRTPlannerNonholonomic(object):
                 curr_state = x_new.copy()
                 plan.append(x_new)
                 cost += c
-            else:
-                plan = plan[:-3]
-                if len(plan) == 0:
-                    x_new = start_config.copy()
-                    plan = [start_config]
-                x_new = plan[-1]
+            # else:
+            #     if len(plan) > 1: 
+            #         plan = plan[:-1]
+            #         x_new = start_config.copy()
+            #         cost -= 6
+            #     x_new = plan[-1]
             iters += 1
 
+        print(plan)
         plan_time = time.time() - plan_time
         print("Num Iters: %d" % iters)
         print("Cost: %f" % cost)
@@ -55,7 +56,6 @@ class RRTPlannerNonholonomic(object):
     def cap_motion(self, linear_vel, steer_angle):
         if np.abs(linear_vel) > self.env.max_linear_vel:
             linear_vel *= (self.env.max_linear_vel / np.abs(linear_vel))
-            print('max')
         if np.abs(steer_angle) > self.env.max_steer_angle:
             steer_angle *= (self.env.max_steer_angle / np.abs(steer_angle))
         return linear_vel, steer_angle
@@ -72,18 +72,16 @@ class RRTPlannerNonholonomic(object):
 
     def getNetwork(self, version):
         net = None
+        from rrtnet import RRTNet    
+        net = RRTNet()
         if version == 0:
-            from rrtnet import RRTNet    
-            net = RRTNet()
             net.load_state_dict(torch.load("./models/rrtnet.pth", map_location="cpu"))
         elif version == 1:
-            from rrtnet import RRTNet    
-            net = RRTNet()
             net.load_state_dict(torch.load("./models/rrtnetnodrop.pth", map_location="cpu")) 
         elif version == 2:
-            from rrtnet import RRTNet    
-            net = RRTNet()
             net.load_state_dict(torch.load("./models/rrtnet200.pth", map_location="cpu")) 
+        elif version == 3:
+            net.load_state_dict(torch.load("./models/rrtwonet.pth", map_location="cpu"))
         # net.eval()
         return net
 
