@@ -65,8 +65,8 @@ if __name__ == "__main__":
     # First setup the environment and the robot.
     dim = 2 # change to 3 for holonomic
     
-    image_num = 66
-    total_paths = 100
+    image_num = 100 # how many maps do you already have
+    total_paths = 101 # what map # do you want to end on?
     with open("data.csv", mode='a', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
         for dirname, dirnames, filenames in os.walk('../train_maps'):
