@@ -18,7 +18,7 @@ def main(planning_env, planner, start, goal, argplan = 'astar'):
     visited = None
     tree = planner.tree
     # TODO: Comment out later
-    # planning_env.visualize_plan(plan, tree, visited)
+    planning_env.visualize_plan(plan, tree, visited)
     # plt.show()
     return plan, actions
 
@@ -40,14 +40,14 @@ if __name__ == "__main__":
     # First setup the environment and the robot.
     dim = 3 # change to 3 for holonomic
     
-    image_num = 737
-    total_paths = 200
-    with open("data.csv", mode='a', newline='') as csv_file:
+    image_num = 0
+    total_paths = 50 
+    with open("test_data.csv", mode='a', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
         for j in range(0,5):
             for i in range(total_paths):
             
-                map_path = './images/' + str(i) + '.jpg'
+                map_path = './test_images/' + str(i) + '.jpg'
             
                 planning_env = CarEnvironment(map_path, image_num)
             
