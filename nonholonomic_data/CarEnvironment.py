@@ -20,9 +20,8 @@ class CarEnvironment(object):
         # self.map = np.loadtxt("car_map.txt")
         # self.map_image = self.map
         image = cv2.imread(mapFile, 0)
-        
-        # image = self.crop(image)
-        # image = cv2.resize(image, (128,128))
+        image = self.crop(image)
+        image = cv2.resize(image, (128,128))
         self.map_image = np.copy(image)
         self.map = image
         whites = self.map >= 250
@@ -40,7 +39,9 @@ class CarEnvironment(object):
         self.max_steer_angle = max_steer_angle
 
         start = self.get_random_state()
-        goal = self.get_random_state()
+        goal = start.copy()
+        goal[2,0] = np.random.uniform(0, np.pi * 2)
+        # goal = self.get_random_state()
 
         self.start = start
         self.goal = goal
@@ -102,7 +103,7 @@ class CarEnvironment(object):
         steer_angle = (2*np.random.rand() - 1) * self.max_steer_angle # uniformly distributed
         return linear_vel, steer_angle
 
-    def simulate_car(self, x_near, linear_vel, steer_angle):
+    def simulate_car(self, x_near, x_rand, linear_vel, steer_angle):
         """ Simulates a given control from the nearest state on the graph to the random sample.
 
             @param x_near: a [3 x 1] numpy array. Nearest point on the current graph to the random sample
@@ -286,4 +287,4 @@ class CarEnvironment(object):
             for i in range(np.shape(plan)[1]):
                 self.plot_car(plan[:,i:i+1])
 
-        self.fig.savefig('./test_paths/' + str(self.i) + '.png')
+        self.fig.savefig('./paths/' + str(self.i) + '.png')
