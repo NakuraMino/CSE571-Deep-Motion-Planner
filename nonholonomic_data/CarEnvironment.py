@@ -1,5 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
+import cv2
+import torch
 
 class CarEnvironment(object):
     """ Car Environment. Car is represented as a circular robot.
@@ -7,7 +9,7 @@ class CarEnvironment(object):
         Robot state: [x, y, theta]
     """
     
-    def __init__(self, mapObj, image_num, radius=15,
+    def __init__(self, mapFile, image_num, radius=15,
                  delta_step=10, max_linear_vel=20, max_steer_angle=1.):
 
         # self.radius = radius
@@ -15,19 +17,35 @@ class CarEnvironment(object):
         
         # Obtain the boundary limits.
         # Check if file exists.
-        self.mapObj = mapObj
-        self.map = mapObj.occupancy_grid
+        # self.map = np.loadtxt("car_map.txt")
+        # self.map_image = self.map
+        image = cv2.imread(mapFile, 0)
+        image = self.crop(image)
+        image = cv2.resize(image, (128,128))
+        self.map_image = np.copy(image)
+        self.map = image
+        whites = self.map >= 250
+        blacks = self.map < 250
+        self.map[whites] = 0
+        self.map[blacks] = 1
+
         self.xlimit = [0, np.shape(self.map)[1]-1]
         self.ylimit = [0, np.shape(self.map)[0]-1]
 
         self.i = image_num
 
-        self.delta_step = int(delta_step / 2)         # Number of steps in simulation rollout
-        self.max_linear_vel = int(max_linear_vel / 2)
-        self.max_steer_angle = int(max_steer_angle / 2)
+        self.delta_step = 5 # int(delta_step * 3 / 4)         # Number of steps in simulation rollout
+        self.max_linear_vel = int(max_linear_vel * 3 / 4)
+        self.max_steer_angle = max_steer_angle
 
         start = self.get_random_state()
-        goal = self.get_random_state()
+        goal = start.copy()
+        print(start)
+        goal[2,0] += np.pi
+        goal[2,0] = goal[2,0] % (2 * np.pi)
+        print(goal)
+        # goal = self.get_random_state()
+
         self.start = start
         self.goal = goal
 
@@ -35,6 +53,31 @@ class CarEnvironment(object):
         if not self.state_validity_checker(start) or not self.state_validity_checker(goal):
             raise ValueError('Start and Goal state must be within the map limits');
             exit(0)
+
+    def return_image(self):
+        return self.map_image
+
+    def crop(self, image):
+        ymax = image.shape[0]
+        xmax = image.shape[1]
+        new_img = np.zeros((500,500))
+        if ymax > 500 and xmax > 500:
+            y = np.random.randint(0, ymax - 500) # new upper left corner
+            x = np.random.randint(0, xmax - 500) # new upper left corner
+            new_img = image[y:y+500,x:x+500] 
+            div = 2
+            count = 1
+            while np.sum(new_img != 0) < ((500 ** 2) / div):
+                y = np.random.randint(0, ymax - 500) # new upper left corner
+                x = np.random.randint(0, xmax - 500) # new upper left corner
+                new_img = image[y:y+500,x:x+500] 
+                if count % 5 == 4: # decrease necessary free area if impossible
+                    div += 1
+                count += 1
+
+            return new_img
+        else: 
+            return image
 
     def get_random_state(self):
         state = np.zeros((3,1))
@@ -95,9 +138,8 @@ class CarEnvironment(object):
         
         # Find the closest point to x_rand on the rollout
         # This is x_new. Discard the rest of the rollout
-        min_ind = np.argmin(self.compute_distance(rollout, x_rand))
+        min_ind = self.delta_step
         x_new = rollout[:, min_ind].reshape(3,1)
-        rollout = rollout[:, :min_ind+1] # don't need the rest
         delta_t = rollout.shape[1]
         
         # Check for validity of the path
@@ -144,7 +186,7 @@ class CarEnvironment(object):
             @param config: a [3 x 1] numpy array of a state
             @param goal_config: a [3 x 1] numpy array of goal state
         """        
-        if np.linalg.norm(config[:2,:] - goal_config[:2,:]) < 10 and \
+        if np.linalg.norm(config[:2,:] - goal_config[:2,:]) < 7.5 and \
            np.abs(self.angular_difference(config, goal_config)) < 5:
             print(f'Goal reached! State: {config[:,0]}, Goal state: {goal_config[:,0]}')
             print(f'xy_diff: {np.linalg.norm(config[:2,:] - goal_config[:2,:]):.03f}, '\
@@ -244,21 +286,8 @@ class CarEnvironment(object):
         self.ax1.cla()
         self.ax1.imshow(visit_map, interpolation="nearest", cmap="gray")
 
-        if tree is not None:
-            for idx in range(len(tree.vertices)):
-                if idx == tree.GetRootID():
-                    continue
-                econfig = tree.vertices[idx]
-                sconfig = tree.vertices[tree.edges[idx]]
-                x = [sconfig[0], econfig[0]]
-                y = [sconfig[1], econfig[1]]
-                self.ax1.plot(y, x, 'r')
-
         if plan is not None:
             for i in range(np.shape(plan)[1]):
                 self.plot_car(plan[:,i:i+1])
-                # self.fig.canvas.draw()
-                # plt.pause(.025) 
 
-        self.fig.canvas.draw()
         self.fig.savefig('./paths/' + str(self.i) + '.png')
