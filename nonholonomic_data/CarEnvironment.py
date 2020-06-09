@@ -20,9 +20,8 @@ class CarEnvironment(object):
         # self.map = np.loadtxt("car_map.txt")
         # self.map_image = self.map
         image = cv2.imread(mapFile, 0)
-        
-        # image = self.crop(image)
-        # image = cv2.resize(image, (128,128))
+        image = self.crop(image)
+        image = cv2.resize(image, (128,128))
         self.map_image = np.copy(image)
         self.map = image
         whites = self.map >= 250
@@ -40,7 +39,12 @@ class CarEnvironment(object):
         self.max_steer_angle = max_steer_angle
 
         start = self.get_random_state()
-        goal = self.get_random_state()
+        goal = start.copy()
+        print(start)
+        goal[2,0] += np.pi
+        goal[2,0] = goal[2,0] % (2 * np.pi)
+        print(goal)
+        # goal = self.get_random_state()
 
         self.start = start
         self.goal = goal
@@ -102,7 +106,7 @@ class CarEnvironment(object):
         steer_angle = (2*np.random.rand() - 1) * self.max_steer_angle # uniformly distributed
         return linear_vel, steer_angle
 
-    def simulate_car(self, x_near, linear_vel, steer_angle):
+    def simulate_car(self, x_near, x_rand, linear_vel, steer_angle):
         """ Simulates a given control from the nearest state on the graph to the random sample.
 
             @param x_near: a [3 x 1] numpy array. Nearest point on the current graph to the random sample
@@ -182,7 +186,7 @@ class CarEnvironment(object):
             @param config: a [3 x 1] numpy array of a state
             @param goal_config: a [3 x 1] numpy array of goal state
         """        
-        if np.linalg.norm(config[:2,:] - goal_config[:2,:]) < 10 and \
+        if np.linalg.norm(config[:2,:] - goal_config[:2,:]) < 7.5 and \
            np.abs(self.angular_difference(config, goal_config)) < 5:
             print(f'Goal reached! State: {config[:,0]}, Goal state: {goal_config[:,0]}')
             print(f'xy_diff: {np.linalg.norm(config[:2,:] - goal_config[:2,:]):.03f}, '\
@@ -286,4 +290,4 @@ class CarEnvironment(object):
             for i in range(np.shape(plan)[1]):
                 self.plot_car(plan[:,i:i+1])
 
-        # self.fig.savefig('./paths/' + str(self.i) + '.png')
+        self.fig.savefig('./paths/' + str(self.i) + '.png')

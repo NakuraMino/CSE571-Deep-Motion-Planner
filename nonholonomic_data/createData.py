@@ -18,7 +18,7 @@ def main(planning_env, planner, start, goal, argplan = 'astar'):
     visited = None
     tree = planner.tree
     # TODO: Comment out later
-    # planning_env.visualize_plan(plan, tree, visited)
+    planning_env.visualize_plan(plan, tree, visited)
     # plt.show()
     return plan, actions
 
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     total_paths = 200
     with open("data.csv", mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
-        for j in range(0,5):
+        for j in range(0,1):
             for i in range(total_paths):
             
                 map_path = './images/' + str(i) + '.jpg'
