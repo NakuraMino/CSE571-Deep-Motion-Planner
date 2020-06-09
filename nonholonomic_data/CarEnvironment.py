@@ -40,7 +40,10 @@ class CarEnvironment(object):
 
         start = self.get_random_state()
         goal = start.copy()
-        goal[2,0] = np.random.uniform(0, np.pi * 2)
+        print(start)
+        goal[2,0] += np.pi
+        goal[2,0] = goal[2,0] % (2 * np.pi)
+        print(goal)
         # goal = self.get_random_state()
 
         self.start = start
@@ -183,7 +186,7 @@ class CarEnvironment(object):
             @param config: a [3 x 1] numpy array of a state
             @param goal_config: a [3 x 1] numpy array of goal state
         """        
-        if np.linalg.norm(config[:2,:] - goal_config[:2,:]) < 10 and \
+        if np.linalg.norm(config[:2,:] - goal_config[:2,:]) < 7.5 and \
            np.abs(self.angular_difference(config, goal_config)) < 5:
             print(f'Goal reached! State: {config[:,0]}, Goal state: {goal_config[:,0]}')
             print(f'xy_diff: {np.linalg.norm(config[:2,:] - goal_config[:2,:]):.03f}, '\

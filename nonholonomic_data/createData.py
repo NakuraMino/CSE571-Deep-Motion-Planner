@@ -65,4 +65,3 @@ if __name__ == "__main__":
                         y = actions[i]
                         csv_writer.writerow([xt[0],xt[1],xt[2],gool[0],gool[1],gool[2],map_path,y[0], y[1]])
                 image_num += 1
-                break
