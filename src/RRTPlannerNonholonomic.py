@@ -16,36 +16,32 @@ class RRTPlannerNonholonomic(object):
     def Plan(self, start_config, goal_config):
         # TODO: YOUR IMPLEMENTATION HERE
         
-        net = self.getNetwork(3)
+        net = self.getNetwork(3, 0.1)
         plan_time = time.time()
         plan = [start_config]
         cost = 0
         iters = 0
+        fails = 0
         # Start with adding the start configuration to the tree.
         # self.tree.AddVertex(start_config)
 
         curr_state = start_config.copy()
-        while not self.env.lax_goal_criterion(curr_state, goal_config) and iters < 1000:
+        while not self.env.lax_goal_criterion(curr_state, goal_config) and iters < 200:
             input_state = torch.from_numpy(np.concatenate((curr_state, goal_config), axis=0)).float().T
             action = net((input_state, self.env.torch_map))
             action = action.detach().numpy()
             linear_vel, steer_angle = action[0,0], action[0,1]
             linear_vel, steer_angle = self.cap_motion(linear_vel, steer_angle)
-            # print(linear_vel, steer_angle)
+            
             x_new, c = self.env.simulate_car(curr_state, linear_vel, steer_angle)
             if x_new is not None:    
+                fails = 0
                 curr_state = x_new.copy()
                 plan.append(x_new)
                 cost += c
-            # else:
-            #     if len(plan) > 1: 
-            #         plan = plan[:-1]
-            #         x_new = start_config.copy()
-            #         cost -= 6
-            #     x_new = plan[-1]
             iters += 1
 
-        print(plan)
+        # print(plan)
         plan_time = time.time() - plan_time
         print("Num Iters: %d" % iters)
         print("Cost: %f" % cost)
@@ -70,10 +66,10 @@ class RRTPlannerNonholonomic(object):
         '''
         pass
 
-    def getNetwork(self, version):
+    def getNetwork(self, version, p):
         net = None
         from rrtnet import RRTNet    
-        net = RRTNet()
+        net = RRTNet(p)
         if version == 0:
             net.load_state_dict(torch.load("./models/rrtnet.pth", map_location="cpu"))
         elif version == 1:
