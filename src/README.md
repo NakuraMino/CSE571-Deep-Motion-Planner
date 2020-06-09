@@ -50,4 +50,5 @@ Below are a quick list of commands that work/don't work for each of the planners
 ##### Doesn't Work 
 
 > python run_astar.py -i 0 -s 30 70 -g 75 70
-> python run_rrt.py -i 37 -s 90 110 1 -g 20 60 2        (curvy boi but bad start angle)
+
+> python run_rrt.py -i 37 -s 90 110 1 -g 20 60 2        (curvy boi but bad start angle, works with p=0.7)

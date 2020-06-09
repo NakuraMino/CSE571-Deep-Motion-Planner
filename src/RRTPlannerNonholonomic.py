@@ -16,7 +16,7 @@ class RRTPlannerNonholonomic(object):
     def Plan(self, start_config, goal_config):
         # TODO: YOUR IMPLEMENTATION HERE
         
-        net = self.getNetwork(3, 0.1)
+        net = self.getNetwork(3, 0.7)
         plan_time = time.time()
         plan = [start_config]
         cost = 0
