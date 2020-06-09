@@ -26,6 +26,7 @@ class RRTPlannerNonholonomic(object):
         # self.tree.AddVertex(start_config)
 
         curr_state = start_config.copy()
+
         while not self.env.lax_goal_criterion(curr_state, goal_config) and iters < 200:
             input_state = torch.from_numpy(np.concatenate((curr_state, goal_config), axis=0)).float().T
             action = net((input_state, self.env.torch_map))
@@ -40,7 +41,7 @@ class RRTPlannerNonholonomic(object):
                 plan.append(x_new)
                 cost += c
             iters += 1
-
+        
         # print(plan)
         plan_time = time.time() - plan_time
         print("Num Iters: %d" % iters)
