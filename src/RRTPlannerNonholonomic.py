@@ -18,7 +18,7 @@ class RRTPlannerNonholonomic(object):
         p = 0.1
         plan_time = time.time()
         while p <= 0.7:
-            net = self.getNetwork(3, p)
+            net = self.getNetwork(4, p)
             plan = [start_config]
             cost = 0
             iters = 0
@@ -76,15 +76,15 @@ class RRTPlannerNonholonomic(object):
         from rrtnet import RRTNet    
         net = RRTNet(p)
         if version == 0:
-            net.load_state_dict(torch.load("./models/rrtnet.pth", map_location="cpu"))
+            net.load_state_dict(torch.load("./models/RRTNet.pth", map_location="cpu"))
         elif version == 1:
-            net.load_state_dict(torch.load("./models/rrtnetnodrop.pth", map_location="cpu")) 
+            net.load_state_dict(torch.load("./models/RRTNetNoDrop.pth", map_location="cpu")) 
         elif version == 2:
-            net.load_state_dict(torch.load("./models/rrtnet200.pth", map_location="cpu")) 
+            net.load_state_dict(torch.load("./models/RRTNet200.pth", map_location="cpu")) 
         elif version == 3:
-            net.load_state_dict(torch.load("./models/rrtwonet.pth", map_location="cpu"))
+            net.load_state_dict(torch.load("./models/RRTwoNet.pth", map_location="cpu"))
         elif version == 4:
-            net.load_state_dict(torch.load("./models/rrttrrnet.pth", map_location="cpu"))
+            net.load_state_dict(torch.load("./models/RRTTRRNet.pth", map_location="cpu"))
         # net.eval()
         return net
 
