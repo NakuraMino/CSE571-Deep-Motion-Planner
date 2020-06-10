@@ -72,13 +72,13 @@ class RRTPlannerNonholonomic(object):
         from rrtnet import RRTNet    
         net = RRTNet(p)
         if version == 0:
-            net.load_state_dict(torch.load("./models/rrtnet.pth", map_location="cpu"))
+            net.load_state_dict(torch.load("./models/RRTNet.pth", map_location="cpu"))
         elif version == 1:
-            net.load_state_dict(torch.load("./models/rrtnetnodrop.pth", map_location="cpu")) 
+            net.load_state_dict(torch.load("./models/RRTNetNoDrop.pth", map_location="cpu")) 
         elif version == 2:
-            net.load_state_dict(torch.load("./models/rrtnet200.pth", map_location="cpu")) 
+            net.load_state_dict(torch.load("./models/RRTNet200.pth", map_location="cpu")) 
         elif version == 3:
-            net.load_state_dict(torch.load("./models/rrtwonet.pth", map_location="cpu"))
+            net.load_state_dict(torch.load("./models/RRTwoNet.pth", map_location="cpu"))
         # net.eval()
         return net
 

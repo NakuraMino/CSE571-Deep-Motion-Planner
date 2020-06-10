@@ -7,6 +7,7 @@ class AStarPlanner(object):
         self.env = planning_env
         self.nodes = {}
         self.visited = np.zeros(self.env.map.shape)
+        self.NN_failed = False
 
     def Plan(self, start_config, goal_config):
         # TODO: YOUR IMPLEMENTATION HERE
@@ -27,6 +28,7 @@ class AStarPlanner(object):
             # delta, c = self.action_to_delta(action)
             delta, c = self.getViableAction(action, curr_state)
             if delta is None:
+                self.NN_failed = True
                 break
             curr_state += delta
             plan.append(np.copy(curr_state))
@@ -34,6 +36,8 @@ class AStarPlanner(object):
             iters += 1
         
         state_count = len(plan)
+        if not self.NN_failed:
+            print('NN successfully found path from start to goal!')
         print("States Expanded: %d" % state_count)
         print("Cost: %f" % cost)
 
@@ -71,11 +75,15 @@ class AStarPlanner(object):
             # print("dest", dest)
             forward = not forward
             if none >= 2:
+                self.NN_failed = True
+                print('NN failed to give path from start pos to goal pos!')
                 break
         start_plan, goal_plan = self.replanning(start_plan, goal_plan)
         plan = start_plan
         plan.extend(goal_plan)
         state_count = len(plan)
+        if not self.NN_failed:
+            print('NN successfully found path from start to goal!')
         print("Cost: %f" % cost)
         print("States Expanded: %d" % state_count)
         
@@ -107,7 +115,7 @@ class AStarPlanner(object):
         if version == 0:
             from astarnet import AStarNet    
             net = AStarNet()
-            net.load_state_dict(torch.load("./models/astarnet500.pth", map_location="cpu"))
+            net.load_state_dict(torch.load("./models/AStarNet500.pth", map_location="cpu"))
         elif version == 1:
             from shootingstarnet import ShootingStarNet
             net = ShootingStarNet()
@@ -121,16 +129,23 @@ class AStarPlanner(object):
         delta, c = self.action_to_delta(index)
         next_state = curr_state + delta
         count = 0
-        while self.already_visited(next_state) or not self.env.state_validity_checker(next_state):    
-            action = np.delete(action, index - 1)
-            if action.shape[0] == 0:
-                return None, None
-            index = np.argmax(action) + 1
-            delta, c = self.action_to_delta(index)
-            next_state = curr_state + delta        
-            count += 1
-        self.visit(next_state)
-        return delta, c
+        y, x = next_state[0,0], next_state[1,0]
+        if y >= self.env.ylimit[0] and y < self.env.ylimit[1] and x >= self.env.xlimit[0] and x < self.env.xlimit[1]:
+            while self.already_visited(next_state) or not self.env.state_validity_checker(next_state):    
+                action = np.delete(action, index - 1)
+                if action.shape[0] == 0:
+                    return None, None
+                index = np.argmax(action) + 1
+                delta, c = self.action_to_delta(index)
+                next_state = curr_state + delta        
+                y, x = next_state[0,0], next_state[1,0]
+                if y < self.env.ylimit[0] or y > self.env.ylimit[1] or x < self.env.xlimit[0] or x > self.env.xlimit[1]:
+                    return None, None
+                count += 1
+            self.visit(next_state)
+            return delta, c
+        else:
+            return None, None
 
     def visit(self, state):
         y, x = state[0, 0], state[1, 0]
@@ -138,6 +153,8 @@ class AStarPlanner(object):
     
     def already_visited(self, state):
         y, x = state[0, 0], state[1, 0]
+        # if y < self.env.ylimit[0] or y > self.env.ylimit[1] or x < self.env.xlimit[0] or x > self.env.xlimit[1]:
+            # return False
         return self.visited[int(y), int(x)] == 1
     
     def action_to_delta(self, action):

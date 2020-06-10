@@ -9,20 +9,25 @@ from RRTPlannerNonholonomic import RRTPlannerNonholonomic
 
 def main(planning_env, planner, start, goal, argplan = 'astar'):
 
-    # Notify.
-    input('Press any key to begin planning...')
-
-    planning_env.init_visualizer()
-
     # Plan.
-    plan = planner.BDPlan(start, goal)
+    if args.bi_directional == 'True':
+        plan = planner.BDPlan(start, goal)
+    else:
+        plan = planner.Plan(start, goal)
 
     # Visualize the final path.
     tree = None
     visited = planner.visited
 
-    planning_env.visualize_plan(plan, tree, visited)
-    plt.show()
+    if planner.NN_failed:
+        print('NN failed to give path from start pos to goal pos!')
+    else:
+        print('NN successfully found path from start to goal!')
+
+    if args.plotting == 'True':
+        planning_env.init_visualizer()
+        planning_env.visualize_plan(plan, tree, visited)
+        plt.show()
 
 
 if __name__ == "__main__":
@@ -35,6 +40,8 @@ if __name__ == "__main__":
     parser.add_argument('-i', '--index', type=str, default='0', help='image index') 
     parser.add_argument('-s', '--start', nargs='+', type=float, required=True)
     parser.add_argument('-g', '--goal', nargs='+', type=float, required=True)
+    parser.add_argument('-p', '--plotting', type=str, default='True', required=False, help='turn plotting on or off')
+    parser.add_argument('-b', '--bi_directional', type=str, default='True', required=False, help='use bi-directional planner')
 
     args = parser.parse_args()
     image_folder = ''

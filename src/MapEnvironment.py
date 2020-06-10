@@ -60,9 +60,15 @@ class MapEnvironment(object):
         """ Return True if all states are valid
 
             @param config: a [2 x n] numpy array of states
+            
+            **NOTE:** Since the maps are inverted in color, this
+                      method is actually returning the OPPOSITE!
+                      Check getViableAction() in AStarPlanner for verification.
         """
         # TODO: YOUR IMPLEMENTATION HERE
         y, x = config[0,0], config[1,0]
+        if y < self.ylimit[0] or y > self.ylimit[1] or x < self.xlimit[0] or x > self.xlimit[1]:
+            return True
         return self.map[int(y),int(x)] == 0
 
     def edge_validity_checker(self, config1, config2):
