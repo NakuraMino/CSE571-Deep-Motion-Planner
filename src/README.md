@@ -9,6 +9,7 @@ Github prohibits uploading files >100mb. This means my ShootingStarNet.pth canno
 To test AStarNet, or any other neural network model, please run 
 
 > python run_astar.py -t -i -s -g
+
 > python run_rrt.py -t -s -s -g
 
 where:
