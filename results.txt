@@ -42,6 +42,14 @@ Planner = Normal A-star-like planner
 Dataset = Testing dataset, full dataset
   Successes = 1427/3068 (46.51%)
 
+---------------
+Cost comparison
+---------------
+For test-1
+AStar - 84.455844
+DoubleShootingStar bidirectional - 84.870058
+DoubleShootingStar unidirectional - 86.698485
+
 ---------------------------------------
 Non-holonomic testing
 ---------------------------------------
