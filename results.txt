@@ -10,7 +10,7 @@ Dataset = Testing dataset, one run per map
 NN = ShootingStarNet
 Planner = Bi-directional planner
 Dataset = Testing dataset, full dataset
-  Successes = 
+  Successes = 1728/3068 (56.32%)
 
 NN = ShootingStarNet
 Planner = Normal A-star-like planner
@@ -18,9 +18,9 @@ Dataset = Testing dataset, one run per map
   Successes = 7/25 (28%)
 
 NN = ShootingStarNet
-Planner = Bi-directional planner
+Planner = Normal A-star-like planner
 Dataset = Testing dataset, full dataset
-  Successes = 
+  Successes = 1691/3068 (55.12%)
 
 ---------------------------------------
 Non-holonomic testing
