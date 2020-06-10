@@ -83,6 +83,8 @@ class RRTPlannerNonholonomic(object):
             net.load_state_dict(torch.load("./models/rrtnet200.pth", map_location="cpu")) 
         elif version == 3:
             net.load_state_dict(torch.load("./models/rrtwonet.pth", map_location="cpu"))
+        elif version == 4:
+            net.load_state_dict(torch.load("./models/rrttrrnet.pth", map_location="cpu"))
         # net.eval()
         return net
 
