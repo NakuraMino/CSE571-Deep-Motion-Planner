@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     # True uses the bidirectional planner.
     # False uses unidirectional planner.
-    args_bi_directional = 'False'
+    args_bi_directional = 'True'
 
     if args_type == 'test':
         dataset = pd.read_csv('../holomonic_data/test_data.csv', header=None)

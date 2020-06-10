@@ -121,8 +121,8 @@ class AStarPlanner(object):
             net = ShootingStarNet()
             net.load_state_dict(torch.load("./models/ShootingStarNet.pth", map_location="cpu"))
         elif version == 2:
-            from astartnet import AStarNet
-            net = AStartNet()
+            from astarnet import AStarNet
+            net = AStarNet()
             net.load_state_dict(torch.load("./models/ADoubleStarNet.pth", map_location="cpu"))
         net.eval()
         return net

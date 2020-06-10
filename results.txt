@@ -22,6 +22,26 @@ Planner = Normal A-star-like planner
 Dataset = Testing dataset, full dataset
   Successes = 1691/3068 (55.12%)
 
+NN = ADoubleStarNet
+Planner = Bi-directional planner
+Dataset = Testing dataset, one run per map
+  Successes = 13/25 (52%)
+
+NN = ADoubleStarNet
+Planner = Bi-directional planner
+Dataset = Testing dataset, full dataset
+  Successes = 1728/3068 (56.32%)
+
+NN = ADoubleStarNet
+Planner = Normal A-star-like planner
+Dataset = Testing dataset, one run per map
+  Successes = 7/25 (28%)
+
+NN = ADoubleStarNet
+Planner = Normal A-star-like planner
+Dataset = Testing dataset, full dataset
+  Successes = 1427/3068 (46.51%)
+
 ---------------------------------------
 Non-holonomic testing
 ---------------------------------------
