@@ -65,9 +65,9 @@ if __name__ == "__main__":
     # First setup the environment and the robot.
     dim = 2 # change to 3 for holonomic
     
-    image_num = 0 # how many maps do you already have
-    total_paths = 25 # what map # do you want to end on?
-    with open("test_data.csv", mode='w', newline='') as csv_file:
+    image_num = 101 # how many maps do you already have
+    total_paths = 102 # what map # do you want to end on?
+    with open("data.csv", mode='a', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
         for dirname, dirnames, filenames in os.walk('../test_maps'):
             while image_num < total_paths:
@@ -75,7 +75,7 @@ if __name__ == "__main__":
                     
                     map_path = dirname + "/" + subdirname + "/floor_trav_0_v2.png"
                     
-                    img_path = "./test_images/" + str(image_num) + ".png"
+                    img_path = "./images/" + str(image_num) + ".png"
                     # ticks_path = "./test_ticks/" + str(image_num) + ".png"
 
                     planning_env = MapEnvironment(map_path, image_num)
@@ -86,10 +86,10 @@ if __name__ == "__main__":
                     image_num += 1
 
                     for i in range(2):
-                        # if i == 0:
-                        #     planning_env.setStates()
-                        # else:
-                        planning_env.setRandomStates()
+                        if i == 0:
+                            planning_env.setStates()
+                        else:
+                            planning_env.setRandomStates()
 
                         args.start = planning_env.start
                         args.goal = planning_env.goal
