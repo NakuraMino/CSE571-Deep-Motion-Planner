@@ -15,35 +15,39 @@ class RRTPlannerNonholonomic(object):
 
     def Plan(self, start_config, goal_config):
         # TODO: YOUR IMPLEMENTATION HERE
-        
-        net = self.getNetwork(3, 0.7)
+        p = 0.1
         plan_time = time.time()
-        plan = [start_config]
-        cost = 0
-        iters = 0
-        fails = 0
-        # Start with adding the start configuration to the tree.
-        # self.tree.AddVertex(start_config)
+        while p <= 0.7:
+            net = self.getNetwork(4, p)
+            plan = [start_config]
+            cost = 0
+            iters = 0
+            fails = 0
+            # Start with adding the start configuration to the tree.
+            # self.tree.AddVertex(start_config)
+            curr_state = start_config.copy()
 
-        curr_state = start_config.copy()
-
-        while not self.env.lax_goal_criterion(curr_state, goal_config) and iters < 200:
-            input_state = torch.from_numpy(np.concatenate((curr_state, goal_config), axis=0)).float().T
-            action = net((input_state, self.env.torch_map))
-            action = action.detach().numpy()
-            linear_vel, steer_angle = action[0,0], action[0,1]
-            linear_vel, steer_angle = self.cap_motion(linear_vel, steer_angle)
+            while not self.env.lax_goal_criterion(curr_state, goal_config) and iters < 200:
+                input_state = torch.from_numpy(np.concatenate((curr_state, goal_config), axis=0)).float().T
+                action = net((input_state, self.env.torch_map))
+                action = action.detach().numpy()
+                linear_vel, steer_angle = action[0,0], action[0,1]
+                linear_vel, steer_angle = self.cap_motion(linear_vel, steer_angle)
+                
+                x_new, c = self.env.simulate_car(curr_state, linear_vel, steer_angle)
+                if x_new is not None:    
+                    fails = 0
+                    curr_state = x_new.copy()
+                    plan.append(x_new)
+                    cost += c
+                iters += 1
             
-            x_new, c = self.env.simulate_car(curr_state, linear_vel, steer_angle)
-            if x_new is not None:    
-                fails = 0
-                curr_state = x_new.copy()
-                plan.append(x_new)
-                cost += c
-            iters += 1
-        
-        # print(plan)
+            if self.env.lax_goal_criterion(curr_state, goal_config):
+                break
+            p += 0.2
+        p = min(p, 0.7)
         plan_time = time.time() - plan_time
+        print("dropout rate: %f" % p)
         print("Num Iters: %d" % iters)
         print("Cost: %f" % cost)
         print("Planning Time: %ds" % plan_time)
@@ -79,6 +83,8 @@ class RRTPlannerNonholonomic(object):
             net.load_state_dict(torch.load("./models/RRTNet200.pth", map_location="cpu")) 
         elif version == 3:
             net.load_state_dict(torch.load("./models/RRTwoNet.pth", map_location="cpu"))
+        elif version == 4:
+            net.load_state_dict(torch.load("./models/RRTTRRNet.pth", map_location="cpu"))
         # net.eval()
         return net
 

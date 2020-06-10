@@ -12,7 +12,7 @@ class AStarPlanner(object):
     def Plan(self, start_config, goal_config):
         # TODO: YOUR IMPLEMENTATION HERE
 
-        net = self.getNetwork(1)
+        net = self.getNetwork(2)
 
         plan = []
         plan.append(start_config.copy())
@@ -120,6 +120,10 @@ class AStarPlanner(object):
             from shootingstarnet import ShootingStarNet
             net = ShootingStarNet()
             net.load_state_dict(torch.load("./models/ShootingStarNet.pth", map_location="cpu"))
+        elif version == 2:
+            from astartnet import AStarNet
+            net = AStartNet()
+            net.load_state_dict(torch.load("./models/ADoubleStarNet.pth", map_location="cpu"))
         net.eval()
         return net
 
