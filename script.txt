@@ -1,0 +1,14 @@
+In this project, we explore how deep learning can be used to imitate existing path planning techniques. Specifically, we consider
+three neural network-based planning algorithms. We demonstrate the applications of these techiques on the point robot and the nonholonomic car, 
+evaluate them on a variety of maps, and present our results.
+
+For the holonomic dataset, we generate optimal paths from the A* planner. 
+
+For the nonholonomic dataset, we use the RRT planner. We generate two types of paths: paths that have the highest cost after running the algorithm 
+for 5 seconds, and paths where the start and goal states are identical except for the orientation. This allows the neural network to generate
+motions where the robot has to change directions.
+
+In general, we used this design for our networks. We pass in the map image through a few convolutional layers, and then pass in the resulting values, along 
+with the start/goal states, through the remaining fully connected layers. We also include dropout layers and use them for training and predicting. 
+Dropout layers are useful because their randomness can help us recover from failed predictions. If a network predicts an invalid action, 
+we can pass in the same input to obtain different motions.
