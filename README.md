@@ -188,19 +188,3 @@ Performance measure of successful plans:
 
 ## Acknowledgements
 This project was a course project for CSE 571 AI-based mobile robotics (Spring 2020) at the University of Washington. The authors would like to thank [Prof. Dieter Fox](https://homes.cs.washington.edu/~fox/) and the course TAs, [Xiangyun Meng](https://homes.cs.washington.edu/~xiangyun/) and [Chris Xie](https://chrisdxie.github.io/) for guidance and for providing the simulation environment. The [project report](./CSE_571_Project_2_Final_Report.pdf) and the [video presentation](https://www.youtube.com/watch?v=eke-qAHdnVo) are also linked here.
-
----------------------------------------------------------------------
-
-motion planning using neural network-based planning algorithms! 
-
-To run our code, go to src/ and run 
-
-> python run_astar.py -t -i -s -g 
-
-> python run_rrt.py -t i -s -g
-
-where
-- t indicates whether to use test or training data (test or train, default=train)
-- i indicated index of map we're using
-- s is start state
-- g is goal state
